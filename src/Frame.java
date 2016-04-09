@@ -4,7 +4,7 @@ import java.awt.*;
 /**
  * Created by Bartłomiej on 2016-03-26.
  */
-public abstract class Frame {
+public abstract class Frame extends JFrame{
 
     Toolkit kit = Toolkit.getDefaultToolkit();
     Dimension dim = kit.getScreenSize();

@@ -8,6 +8,8 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws IOException {
 
+        Graph g1 = new Graph();
+        g1.setVisible(true);
 
         MainMenu mainMenu = new MainMenu();
         JFrame mainMenuFrame= mainMenu.createAFrame(mainMenu.getWidth(),mainMenu.getHeight(),"Main Menu");

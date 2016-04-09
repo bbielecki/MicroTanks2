@@ -1,28 +1,34 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.awt.Graphics;
 
 public class GameFrame extends Frame
 {
-    JPanel gamePanel;
+    GamePanel gamePanel;
     EarthGenerator earthGenerator;
     MicroTanks microTanks;
+    Image dbimage;
+    Graphics dgb;
+
     public GameFrame()
     {
         this.width=width/2;
         this.height=height*3/4;
         earthGenerator = new EarthGenerator();
         microTanks = new MicroTanks();
+        setPreferredSize(new Dimension(300,300));
 
     }
 
     public void createGameFrame(JFrame frame, JFrame mainMenuframe)
     {
         JPanel settingsPanel = new JPanel();
-        gamePanel = new JPanel();
+        gamePanel = new GamePanel(frame.getWidth(),frame.getHeight()/4);
 
         frame.setLayout(new BorderLayout());
         frame.add(settingsPanel,BorderLayout.SOUTH);
@@ -34,10 +40,9 @@ public class GameFrame extends Frame
         setSettingPanel(settingsPanel);
 
         frame.add(gamePanel,BorderLayout.CENTER);
+
         gamePanel.setVisible(true);
-        gamePanel.setBackground(Color.black);
-        Dimension dim2= new Dimension(getWidth(),getHeight()*3/4);
-        gamePanel.setPreferredSize(dim2);
+
 
 
     }
@@ -129,6 +134,7 @@ public class GameFrame extends Frame
             rightPower.setVisible(true);
 
 
+
         }
         catch (MalformedURLException e)
         {
@@ -144,14 +150,26 @@ public class GameFrame extends Frame
     }
 
     public void paint(Graphics g){
-
         paintComponent(g);
-
     }
-
-    public void paintComponent(Graphics g){
-        earthGenerator.earthBuilder(gamePanel);
+    public void paintComponent(Graphics g) {
+        //earthGenerator.earthBuilder(gamePanel,g);
+        g.setColor(Color.BLUE);
         g.drawLine(100,100,200,200);
-        repaint();
-    }
+/*
+        for (int i = 1; i < 100; i++) {
+
+
+            x = gamePanel.getWidth() / 100 * i;
+            x2 = gamePanel.getWidth() / 100 * (i + 1);
+            y = (int) Math.sin(x) / x;
+            y2 = (int) Math.sin(x2) / (x2);
+            line[i] = new Line2D.Double(x, y, x2, y2);
+            g2.drawLine(x, y, x2, y2);
+            g2.setColor(Color.black);
+            }
+*/
+            repaint();
+        }
 }
+
