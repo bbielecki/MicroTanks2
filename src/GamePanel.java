@@ -7,40 +7,38 @@ import java.awt.geom.Line2D;
  */
 public class GamePanel extends JPanel {
     private int width,height;
+    static Tank tank1;
 
     public GamePanel(int x,int y) {
         width=x;
         height=y;
         setPreferredSize(new Dimension(width, height));
+        tank1 = new Tank(width,200);
     }
 
     @Override
     public void paintComponent(Graphics g) {
 
         super.paintComponent(g);
-        int x,x2,y,y2;
-
-        g.drawLine(300,300,200,200);
+        double x,x2,y,y2;
 
 
-        for(int i=1;i<100;i++)
+        for(int i=0;i<100;i++)
         {
-            x=width/100*i;
-            x2=height/100*(i+1);
-            y=(int)((Math.sin(x)/x)*100);
-            y2=(int)((Math.sin(x2)/(x2))*100);
+            x=((double)width/100)*i;
+            x2=((double)width/100)*(i+1);
+            y=200+((Math.sin(i/10))*100);
+            y2=200+((Math.sin((i+1)/10)*100));
             g.setColor(Color.black);
            // line[i]=new Line2D.Double(x,y,x2,y2);
-            g.drawLine(x,y,x2,y2);
+            g.drawLine((int)x,(int)y,(int)x2,(int)y2);
 
         }
+        tank1.draw(g);
+
+        repaint();
 
 
-        //rectangle originated at 10,10 and end at 240,240
-        g.drawRect(10, 10, 240, 240);
-        //filled Rectangle with rounded corners.
-        g.fillRoundRect(50, 50, 100, 100, 80, 80);
-        g.setColor(Color.BLUE);
-        g.drawLine(100,100,200,200);
+
     }
 }
