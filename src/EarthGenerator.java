@@ -5,10 +5,24 @@ import java.io.*;
 import java.util.Properties;
 
 /**
- * Created by Bartłomiej on 2016-04-08.
+ * Klasa <code>EarthGenerator</code> odpowiada za utworzenie planszy w zależności
+ * od podanej funkcji matematycznej.
+ * Dziedziczy po klasie abstrakcyjnej <code>Frame</code>
+ *
+ * @author      Bartłomiej Bielecki <bartlomiejbielecki1@gmail.com>
+ * @author      Jacek Polak <polakjacek@gmail.com>
+ * @version     1.1
+ * @since       2016-03-26
  */
+
 public class EarthGenerator extends Frame{
 
+    /**
+     * Metoda ta tworzy planszę w zależności od funkcji matematycznej.
+     * @param gamePanel Panel, na którym prowadzona jest rozgrywka
+     * @param g Kontekst graficzny
+     * @return Panel z narysowaną planszą
+     */
     public JPanel earthBuilder(GamePanel gamePanel, Graphics g){
 
         int x,x2,y,y2;
@@ -30,6 +44,12 @@ public class EarthGenerator extends Frame{
         return gamePanel;
     }
 
+    /**
+     * Metoda parsująca informacje o planszy do utworzenia z plików
+     * konfiguracyjnych.
+     * @return Wzór funkcji
+     * @throws IOException
+     */
     public String loadMap() throws IOException
     {
         File mapFile = new File("maplvl1.properties");

@@ -2,19 +2,43 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.util.*;
 
 /**
- * Created by admin on 2016-03-27.
+ * Klasa <code>BestScores</code> jest odpowiedzialna za listę najlepszych wyników,
+ * dziedziczy ona po klasie abstrakcyjnej <code>Frame</code>
+ *
+ * @author      Bartłomiej Bielecki <address @ example.com>
+ * @author      Jacek Polak <polakjacek@gmail.com>
+ * @version     1.1
+ * @since       2016-03-26
  */
+
 public class BestScores extends Frame {
 
+    /**Konstruktor klasy <code>BestScores</code> ustawia lokalne wymiary ramki w zależności
+     * od wymiarów ekranu urządzenia uruchamiającego program
+     */
     public BestScores()
     {
         this.width = width *3/4;
         this.height = height * 3 / 4;
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent we) {
+                dispose();
+            }
+        });
     }
+
+    /**
+     *  Metoda ta tworzy ramkę najlepszych wyników gry MicroTanks.
+     * @param BestScoresFrame Ramka, na której umieszczone są pola tekstowe z najlepszymi wynikami
+     * @param mainMenuFrame Ramka menu głównego, do którego powrócimy przyciskiem "Back"
+     * @return Brak
+     */
 
     public void createABestScoresFrame(JFrame BestScoresFrame, JFrame mainMenuFrame)
     {
@@ -78,6 +102,7 @@ public class BestScores extends Frame {
 
         }
         readBestScores(tanksScores1,tanksScores2,tanksScores3);
+        BestScoresFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         backToMenuButton.addActionListener(new ActionListener(){
             @Override
@@ -87,6 +112,19 @@ public class BestScores extends Frame {
             }
         });
     }
+
+    /**
+     * Metoda ta wczytuje do pól tekstowych klasy <code>BestScores</code> najlepsze wyniki z poszczególnych typów
+     * rozgrywek. Wykorzystuje klasę <code>Properties</code>.
+     * @param v1 Tablica typu <code>JTextField</code>, do której zostaną wczytane najlepsze wyniki rozgrywki z jednym czołgiem
+     * @param v2 Tablica typu <code>JTextField</code>, do której zostaną wczytane najlepsze wyniki rozgrywki z dwoma czołgami
+     * @param v3 Tablica typu <code>JTextField</code>, do której zostaną wczytane najlepsze wyniki rozgrywki z trzema czołgami
+     * @return Brak
+     * @exception IOException
+     * @exception FileNotFoundException
+     * @see IOException
+     * @see FileNotFoundException
+     */
 
     public static void readBestScores(JTextField[] v1,JTextField[] v2,JTextField[] v3)
     {
@@ -99,7 +137,7 @@ public class BestScores extends Frame {
 
         String[][] containers = new String[3][10];
         try {
-            File cfgfile = new File("kutas.properties");
+            File cfgfile = new File("bestscores.properties");
             FileInputStream fis = new FileInputStream(cfgfile);
             Properties prop = new Properties();
             prop.load(fis);
