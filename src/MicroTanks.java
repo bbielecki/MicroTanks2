@@ -10,8 +10,8 @@ public class MicroTanks
     }
 
     public void thread(){
-        Thread thread = new Thread(tank1);
-        thread.start();
+      //  Thread thread = new Thread(tank1);
+       // thread.start();
     }
 
 

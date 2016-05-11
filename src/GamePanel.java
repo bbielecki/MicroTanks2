@@ -1,6 +1,8 @@
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,12 +12,13 @@ import java.util.Properties;
  * Klasa ta odpowiada za panel rozgrywki, umieszczony on jest w klasie <code>GameFrame</code>.
  *
  */
-public class GamePanel extends JPanel {
+public class GamePanel extends JPanel implements KeyListener {
     private int width,height;
     private int numberOfTanks=3;
-    private int turnNumber=1;
-    static Tank[] tank;
-    static Tank currentTank;
+    private int turnNumber=1;/////////////////////////        SPROBUJ ZROBIC IMPLEMENTACJE RUCHU W CZOLGU Z WSKAZANIEM NA CZOLG W RUN()/////////
+    private Tank[] tank;
+    private Tank currentTank;
+    Thread[] tankThreads;
 
     /**
      * Konstruktor klasy <code>GamePanel</code> przyjmuje wartości szerokości i wysokości panelu rozgrywki.
@@ -28,13 +31,16 @@ public class GamePanel extends JPanel {
         height=y;
         setPreferredSize(new Dimension(width, height));
         tank = new Tank[numberOfTanks];
+        tankThreads = new Thread[numberOfTanks];
         createTanks(tank);
+        setFocusable(true);
+
     }
 
     public Tank[] createTanks(Tank[] tank){
         for (int i=0;i<numberOfTanks;i++) {
-            tank[i] = new Tank(width, 200);
-            selectATank(tank[i]);
+            tankThreads[i]=new Thread(tank[i]);
+            tank[i] = new Tank(width, 200, tankThreads[i]);
         }
 
         selectATank(tank[1]);
@@ -42,21 +48,24 @@ public class GamePanel extends JPanel {
     }
 
     public void selectATank(Tank tank){
-        setFocusable(true);
-        addKeyListener(tank);
-        new Thread(tank).start();
+
         currentTank=tank;
+        addKeyListener(this);
+        System.out.println("teraz czolg"+currentTank.getX());
+        //currentTank.addNotify();
+        repaint();
     }
 
     public void nextTurn(){
-        int previousTurnNumber=turnNumber;
+        System.out.println("zmiana"+turnNumber + "    "+numberOfTanks);
         if(turnNumber<numberOfTanks) {
-            previousTurnNumber = turnNumber;
-            turnNumber++;
+            turnNumber+=1;
+
         }
         else
             turnNumber=1;
 
+        System.out.println("zmiana"+turnNumber);
         selectATank(tank[turnNumber-1]);
     }
 
@@ -81,8 +90,9 @@ public class GamePanel extends JPanel {
             x2=(i+1);
             y =  200 + formax[0] * Math.sin((double)i/50) + formax[1];
             y2 =  200 + formax[0] * Math.sin((double)(i+1)/50) + formax[1];
-            //for(int j=0;j<numberOfTanks;j++)
-                currentTank.setyCoordinates((int)y,i);
+            for(int j=0;j<numberOfTanks;j++) {
+                tank[j].setyCoordinates((int) y, i);
+            }
             //y=200+((Math.sin(i/10))*100);
             //y = 200 + Integer.parseInt(a) * Math.pow(i,2) + Integer.parseInt(b) + i;
             //y2 = 200 + Integer.parseInt(a) * Math.pow(i+1,2) + Integer.parseInt(b) + (i+1);
@@ -92,12 +102,23 @@ public class GamePanel extends JPanel {
             g.drawLine((int)x,(int)y,(int)x2,(int)y2);
         }
 
-        for(int j=0;j<numberOfTanks;j++)
+        System.out.println(currentTank.getX()+"current Tank");
+        try {
+            currentTank.move();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        for(int j=0;j<numberOfTanks;j++) {
+            tank[j].setRandomY();
             tank[j].draw(g);
+        }
+
 
         repaint();
-
     }
+
+
 
     public void setTanksCoordinates(int x)
     {
@@ -129,4 +150,47 @@ public class GamePanel extends JPanel {
         return form;
     }
 
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    /**
+     * Metoda ustawiająca kierunek czołgu.
+     * @param e KeyEvent
+     */
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        if (keyCode == e.VK_LEFT) {
+            currentTank.setXDirection(-1);
+           // System.out.println("dziala");
+        }
+        if (keyCode == e.VK_RIGHT) {
+            currentTank.setXDirection(1);
+        }
+        if(keyCode == e.VK_SPACE){
+            currentTank.releaseTheBullet();
+        }
+    }
+
+    /**
+     * Metoda zatrzymująca czołg w momencie puszczenia klawisza kierunkowego(srzałki).
+     *
+     * @param e KeyEvent
+     */
+    @Override
+    public void keyReleased(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        if (keyCode == e.VK_LEFT) {
+            currentTank.setXDirection(0);
+        }
+        if (keyCode == e.VK_RIGHT) {
+            currentTank.setXDirection(0);
+        }
+    }
+
+    public void turn (){
+
+
+    }
 }

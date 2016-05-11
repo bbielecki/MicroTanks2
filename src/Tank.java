@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyListener;
 import java.io.Console;
 
@@ -13,11 +12,17 @@ import java.io.Console;
  * @since       2016-03-26
  */
 
-public class Tank extends JPanel implements Runnable,KeyListener {
+public class Tank extends JPanel implements Runnable {
 
-    private int x,y,xDirection,yDirection, widthOfPanel, heightOfPanel;
-    private int localX,localY;
+    private int widthOfTank, heightOfTank;
+    private int lenghtOfCannon, widthOfCannon;
+    private int sizeOfBullet;
+    private double time;
+    private int x,y,xDirection,xBullet,yBullet,xBulletDirection,yBulletDirection, widthOfPanel, heightOfPanel;
+    private static final int g=10;
     private int[] yCoordinates;
+    private Thread moveThread;
+    private boolean bulletReleased=false;
 
     /**
      * Konstruktor klasy <code>Tank</code> tworzy czołg w zależności od współrzędnych,
@@ -25,46 +30,85 @@ public class Tank extends JPanel implements Runnable,KeyListener {
      * @param width Współrzędna 'x' ekranu
      * @param height Współrzędna 'y' ekranu
      */
-    public Tank(int width,int height){
+    public Tank(int width,int height, Thread tThread){
         widthOfPanel=width;
         heightOfPanel=height;
+        moveThread=tThread;
         int rand = (int)(Math.random()*widthOfPanel);
         this.x=rand;
         this.yCoordinates=new int[width];
-        //addKeyListener(this);
+
+        xBullet=x;
+        yBullet=y;
+        widthOfTank=40;
+        heightOfTank=10;
+        lenghtOfCannon= 15;
+        widthOfCannon= 3;
+        sizeOfBullet=3;
     }
 
-    public void setyCoordinates(int y,int i){
-        yCoordinates[i]=y;
+    public void setyCoordinates(int yy,int i){
+        yCoordinates[i]=yy;
+
+    }
+
+    public void setRandomY(){
+        y=yCoordinates[this.x];
     }
     /**
      * Metoda rysująca pojedynczy czołg.
      * @param g Kontekst graficzny
      */
     public void draw(Graphics g) {
+
+        g.setColor(Color.black);
+        g.fillRect(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon, sizeOfBullet,sizeOfBullet);
+
+
         g.setColor(Color.BLUE);
-        g.fillRect(x-20, y-10, 40, 10);
-        g.fillRect(x-20 + 18, y - 25, 3, 15);
+        g.fillRect(x-widthOfTank/2, y-heightOfTank, widthOfTank, heightOfTank);
+        g.fillRect(x-widthOfCannon/2, y - heightOfTank-lenghtOfCannon, widthOfCannon, lenghtOfCannon);
     }
 
     /**
      * Metoda odpowiadająca za ruch czołgu.
      * @return Brak
      */
-    public void move() {
-        x += xDirection;
+    public void move() throws InterruptedException {
+        moveThread.sleep(10);
 
-        if (x <= 1) {
-            x = 1;
+        if (bulletReleased==false) {
+            time=0;
+            x += xDirection;
+            xBullet=x;
+            if (x <= 1) {
+                x = 1;
+                y = yCoordinates[x];
+            }
+            if (x >= widthOfPanel - 20) {
+                x = widthOfPanel - 20;
+                y = yCoordinates[x];
+            }
             y = yCoordinates[x];
+            yBullet=y;
         }
-        if (x >= widthOfPanel - 20) {
-            x = widthOfPanel - 20;
-            y = yCoordinates[x];
+        if(bulletReleased==true){
+            time+=0.1;
+            xBullet+=10;
+            yBullet=(int)(yBullet-1*time+time*time*(double)g/2);
+            System.out.println("szczal");
+            if(xBullet>=widthOfPanel || xBullet<=1 || yBullet<3) {
+                bulletReleased = false;
+                time = 0;
+            }
         }
-        y = yCoordinates[x];
         //System.out.println(x+"   "+y);
     }
+
+    public void releaseTheBullet(){
+        bulletReleased=true;
+    }
+
 
     /**
      * Metoda ustawiająca kierunek czołgu w poziomie.
@@ -73,55 +117,14 @@ public class Tank extends JPanel implements Runnable,KeyListener {
     public void setXDirection(int xdir)
     {
         xDirection = xdir;
+        System.out.println(xDirection + "    " + x);
     }
 
-
-    /**
-     * Metoda ustawiająca kierunek czołgu.
-     * @param e KeyEvent
-     */
-        public void keyPressed(KeyEvent e) {
-            int keyCode = e.getKeyCode();
-            if (keyCode == e.VK_LEFT) {
-                setXDirection(-1);
-            }
-            if (keyCode == e.VK_RIGHT) {
-                setXDirection(1);
-            }
-        }
-
-        /**
-         * Metoda zatrzymująca czołg w momencie puszczenia klawisza kierunkowego(srzałki).
-         *
-         * @param e KeyEvent
-         */
-
-        public void keyReleased(KeyEvent e) {
-            int keyCode = e.getKeyCode();
-            if (keyCode == e.VK_LEFT) {
-                setXDirection(0);
-            }
-            if (keyCode == e.VK_RIGHT) {
-                setXDirection(0);
-            }
-        }
-
-    public void keyTyped(KeyEvent e){}
+    public int getX(){return x;}
 
 
     /**
      * Metoda zdarzeniowa z interfejsu Runnable wykonująca wątek.
      */
-    public void run() {
-        try {
-            while (true) {
-
-                move();
-
-                Thread.sleep(5);
-            }
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-    }
+    public void run(){}
 }

@@ -203,11 +203,16 @@ public class GameFrame extends Frame
             rightPower.setVisible(true);
             backButton.setVisible(true);
 
+            gamePanel.addKeyListener(gamePanel);
+            setPanel.setFocusable(false);
+            gamePanel.setFocusable(true);
+
             backButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     gameFrame.setVisible(false);
                     mainMenuFrame.setVisible(true);
+                    gameFrame.dispose();
                 }
             });
 
@@ -215,6 +220,10 @@ public class GameFrame extends Frame
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     gamePanel.nextTurn();
+                    //gamePanel.transferFocus();
+                    gamePanel.addKeyListener(gamePanel);
+                    gamePanel.requestFocus();
+
                 }
             });
 
