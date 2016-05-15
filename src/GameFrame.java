@@ -84,7 +84,7 @@ public class GameFrame extends Frame
      * @return Stworzony panel ustawień strzału
      */
     private JPanel setSettingPanel(JPanel setPanel, JFrame gameFrame, JFrame mainMenuFrame){
-        JButton shoot = new JButton("fire!");
+        JButton shoot = new JButton("fire!"), nextTurn=new JButton("Next Turn");
         JButton right, left, rightAngle, leftAngle, rightPower, leftPower, backButton;
         JTextField move, angle,angleMeasure, power, powerMeasure;
         JPanel weaponAndBackPanel,anglePanel,movePanel,powerPanel,backPanel, weaponPanel;
@@ -170,6 +170,7 @@ public class GameFrame extends Frame
             weaponAndBackPanel.add(backPanel,BorderLayout.SOUTH);
             weaponPanel.add(weapons);
             weaponPanel.add(shoot);
+            weaponPanel.add(nextTurn);
             backPanel.add(backButton);
             powerPanel.add(power);
             powerPanel.add(leftPower);
@@ -196,6 +197,7 @@ public class GameFrame extends Frame
             rightAngle.setVisible(true);
             weapons.setVisible(true);
             shoot.setVisible(true);
+            nextTurn.setVisible(true);
             power.setVisible(true);
             powerMeasure.setVisible(true);
             leftPower.setVisible(true);
@@ -215,22 +217,36 @@ public class GameFrame extends Frame
                 }
             });
 
-            shoot.addActionListener(new ActionListener() {
+            nextTurn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     gamePanel.nextTurn();
-                    //gamePanel.transferFocus();
-                    gamePanel.addKeyListener(gamePanel);
                     gamePanel.requestFocus();
-
                 }
             });
+
+            shoot.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    gamePanel.setAngle(Integer.parseInt(angleMeasure.getText()));
+                    gamePanel.setStregth(Integer.parseInt(powerMeasure.getText()));
+
+                    gamePanel.shot();
+
+                    //gamePanel.transferFocus();
+                    gamePanel.requestFocus();
+                  //  gamePanel.nextTurn();
+                }
+            });
+
+
 
             right.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
                         gamePanel.moveOfTank(1);
+                        gamePanel.requestFocus();
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
                     }
@@ -242,6 +258,7 @@ public class GameFrame extends Frame
                 public void actionPerformed(ActionEvent e) {
                     try {
                         gamePanel.moveOfTank(-1);
+                        gamePanel.requestFocus();
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
                     }

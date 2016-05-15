@@ -63,8 +63,27 @@ public class GamePanel extends JPanel implements KeyListener {
         addKeyListener(this);
         System.out.println("teraz czolg"+currentTank.getX());
         //currentTank.addNotify();
-        currentTank.setCurrentTankStartPosition(currentTank.getX());
+        currentTank.setReadyToShot(true);
         repaint();
+    }
+    public void moveOfTank(int dir) throws InterruptedException {
+        currentTank.setCurrentTankStartPosition(currentTank.getX());
+        currentTank.setEndOfMove(false);
+        direction=dir;
+    }
+
+    public void shot(){
+        currentTank.setReadyToShot(true);
+        currentTank.releaseTheBullet();
+        repaint();
+    }
+
+    public void setAngle(int angle){
+        currentTank.setAngleOfShot(angle);
+    }
+
+    public void setStregth(int strength){
+        currentTank.setStrengthOfShot(strength);
     }
 
     public void nextTurn(){
@@ -183,10 +202,7 @@ public class GamePanel extends JPanel implements KeyListener {
         return form;
     }
 
-    public void moveOfTank(int dir) throws InterruptedException {
-        currentTank.setEndOfMove(false);
-        direction=dir;
-    }
+
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -207,7 +223,7 @@ public class GamePanel extends JPanel implements KeyListener {
             currentTank.setXDirection(1);
         }
         if(keyCode == e.VK_SPACE){
-            currentTank.startTime=System.currentTimeMillis();
+            //currentTank.startTime=System.currentTimeMillis();
             currentTank.releaseTheBullet();
         }
     }
