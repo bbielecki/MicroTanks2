@@ -71,7 +71,6 @@ public class GameFrame extends Frame
         gamePanel.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
-
     }
 
     /**
@@ -224,6 +223,28 @@ public class GameFrame extends Frame
                     gamePanel.addKeyListener(gamePanel);
                     gamePanel.requestFocus();
 
+                }
+            });
+
+            right.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        gamePanel.moveOfTank(1);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            });
+
+            left.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        gamePanel.moveOfTank(-1);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             });
 

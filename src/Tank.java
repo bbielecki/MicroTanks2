@@ -17,12 +17,16 @@ public class Tank extends JPanel implements Runnable {
     private int widthOfTank, heightOfTank;
     private int lenghtOfCannon, widthOfCannon;
     private int sizeOfBullet;
-    private double time;
+    private double speedY=600, speedX=8;
+    public long startTime, endTime, timeInterval;
+    private int time;
     private int x,y,xDirection,xBullet,yBullet,xBulletDirection,yBulletDirection, widthOfPanel, heightOfPanel;
-    private static final int g=10;
+    private int currentTankStartPosition;
+    private static final int g=50;
     private int[] yCoordinates;
     private Thread moveThread;
-    private boolean bulletReleased=false;
+    private boolean bulletReleased=false, endOfMove=true;
+    public Color colorOfTank;
 
     /**
      * Konstruktor klasy <code>Tank</code> tworzy czołg w zależności od współrzędnych,
@@ -44,7 +48,8 @@ public class Tank extends JPanel implements Runnable {
         heightOfTank=10;
         lenghtOfCannon= 15;
         widthOfCannon= 3;
-        sizeOfBullet=3;
+        sizeOfBullet=10;
+        setDoubleBuffered(true);
     }
 
     public void setyCoordinates(int yy,int i){
@@ -65,21 +70,22 @@ public class Tank extends JPanel implements Runnable {
         g.fillRect(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon, sizeOfBullet,sizeOfBullet);
 
 
-        g.setColor(Color.BLUE);
+        g.setColor(colorOfTank);
         g.fillRect(x-widthOfTank/2, y-heightOfTank, widthOfTank, heightOfTank);
         g.fillRect(x-widthOfCannon/2, y - heightOfTank-lenghtOfCannon, widthOfCannon, lenghtOfCannon);
     }
+
 
     /**
      * Metoda odpowiadająca za ruch czołgu.
      * @return Brak
      */
-    public void move() throws InterruptedException {
+    public void move(int dir) throws InterruptedException {
         moveThread.sleep(10);
 
-        if (bulletReleased==false) {
+        if (bulletReleased==false && endOfMove==false) {
             time=0;
-            x += xDirection;
+            x += dir;
             xBullet=x;
             if (x <= 1) {
                 x = 1;
@@ -91,18 +97,32 @@ public class Tank extends JPanel implements Runnable {
             }
             y = yCoordinates[x];
             yBullet=y;
+            if(x-currentTankStartPosition>=100)
+                endOfMove=true;
         }
         if(bulletReleased==true){
-            time+=0.1;
-            xBullet+=10;
-            yBullet=(int)(yBullet-1*time+time*time*(double)g/2);
+            moveThread.sleep(1);
+            long startTime = System.currentTimeMillis();
+            setBulletCoordinates();
             System.out.println("szczal");
-            if(xBullet>=widthOfPanel || xBullet<=1 || yBullet<3) {
+            if(xBullet>=widthOfPanel || xBullet<=1 || yBullet<3 || yBullet>=500){
                 bulletReleased = false;
+
                 time = 0;
             }
         }
         //System.out.println(x+"   "+y);
+    }
+
+    public void setBulletCoordinates(){
+        double speed;
+        time+=1;
+        endTime = System.currentTimeMillis();
+        timeInterval=(endTime-startTime)/1000;
+        speed=-speedY+time*(double)g/2;
+
+        xBullet+=speedX;
+        yBullet=(int)((double)yBullet+speed/100);
     }
 
     public void releaseTheBullet(){
@@ -121,6 +141,8 @@ public class Tank extends JPanel implements Runnable {
     }
 
     public int getX(){return x;}
+    public void setEndOfMove(boolean flag){endOfMove = flag;}
+    public void setCurrentTankStartPosition(int pos){currentTankStartPosition=pos;}
 
 
     /**
