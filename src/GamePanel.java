@@ -60,7 +60,7 @@ public class GamePanel extends JPanel implements KeyListener {
     public void selectATank(Tank tank){
 
         currentTank=tank;
-        addKeyListener(this);
+        //addKeyListener(this);
         System.out.println("teraz czolg"+currentTank.getX());
         //currentTank.addNotify();
         currentTank.setReadyToShot(true);
@@ -114,24 +114,27 @@ public class GamePanel extends JPanel implements KeyListener {
         int[] formax = new int[2];
         loadMap(formax);
 
-        for(int i=0;i<getWidth();i++)
-        {
-            x=i;
-            x2=(i+1);
-            y =  200 + formax[0] * Math.sin((double)i/50) + formax[1];
-            y2 =  200 + formax[0] * Math.sin((double)(i+1)/50) + formax[1];
-            for(int j=0;j<numberOfTanks;j++) {
-                tank[j].setyCoordinates((int) y, i);
-            }
-            //y=200+((Math.sin(i/10))*100);
-            //y = 200 + Integer.parseInt(a) * Math.pow(i,2) + Integer.parseInt(b) + i;
-            //y2 = 200 + Integer.parseInt(a) * Math.pow(i+1,2) + Integer.parseInt(b) + (i+1);
-            //y2 = 200 + (Math.sin((i + 1) / 10) * 100));
-            g.setColor(Color.black);
-            // line[i]=new Line2D.Double(x,y,x2,y2);
-            g.drawLine((int)x,(int)y,(int)x2,(int)y2);
-        }
+        int[] groundCoordinates = new int[this.getWidth()+2];
+        groundCoordinates=countGroundCoordinates(formax);
+        Polygon ground = new Polygon();
 
+        ground.addPoint(0,this.getHeight());
+        for (int i = 1; i<this.getWidth()+1;i++){
+            ground.addPoint(i,groundCoordinates[i]);
+        }
+        ground.addPoint(this.getWidth()-1,this.getHeight());
+        ground.addPoint(0,this.getHeight());
+
+        for(int i=0;i<this.getWidth();i++)
+        {
+            for(int j=0;j<numberOfTanks;j++) {
+                tank[j].setyCoordinates(groundCoordinates[i+1], i);
+            }
+            // line[i]=new Line2D.Double(x,y,x2,y2);
+        }
+        g.setColor(Color.green);
+        g.fillPolygon(ground);
+        g.drawPolygon(ground);
        // System.out.println(currentTank.getX()+"current Tank");
         try {
             currentTank.move(direction);
@@ -167,6 +170,15 @@ public class GamePanel extends JPanel implements KeyListener {
 
 
         repaint();
+    }
+
+    public int[] countGroundCoordinates(int[] coefficient){
+        int[] groundCoordinates = new int[this.getWidth()+2];
+
+        for (int i = 1; i<this.getWidth()+2;i++) {
+            groundCoordinates[i] =(int) (200 + coefficient[0] * Math.sin((double) (i) / 50) + coefficient[1]);
+        }
+        return groundCoordinates;
     }
 
 

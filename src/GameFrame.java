@@ -212,8 +212,10 @@ public class GameFrame extends Frame
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     gameFrame.setVisible(false);
+                    gameFrame.remove(gamePanel);
+                    gameFrame.remove(setPanel);
                     mainMenuFrame.setVisible(true);
-                    gameFrame.dispose();
+
                 }
             });
 
@@ -233,9 +235,7 @@ public class GameFrame extends Frame
 
                     gamePanel.shot();
 
-                    //gamePanel.transferFocus();
                     gamePanel.requestFocus();
-                  //  gamePanel.nextTurn();
                 }
             });
 

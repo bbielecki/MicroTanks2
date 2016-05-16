@@ -41,7 +41,7 @@ public class Tank extends JPanel implements Runnable {
         moveThread=tThread;
         int rand = (int)(Math.random()*widthOfPanel);
         this.x=rand;
-        this.yCoordinates=new int[width];
+        this.yCoordinates=new int[width*3];
 
         xBullet=x;
         yBullet=y;
@@ -49,7 +49,7 @@ public class Tank extends JPanel implements Runnable {
         heightOfTank=10;
         lenghtOfCannon= 15;
         widthOfCannon= 3;
-        sizeOfBullet=10;
+        sizeOfBullet=3;
         setDoubleBuffered(true);
     }
 
@@ -68,12 +68,17 @@ public class Tank extends JPanel implements Runnable {
     public void draw(Graphics g) {
 
         g.setColor(Color.black);
+        Rectangle bullet=new Rectangle(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon,sizeOfBullet,sizeOfBullet);
         g.fillRect(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon, sizeOfBullet,sizeOfBullet);
 
-
+        Rectangle tank = new Rectangle(x-widthOfTank/2, y-heightOfTank, widthOfTank, heightOfTank);
         g.setColor(colorOfTank);
         g.fillRect(x-widthOfTank/2, y-heightOfTank, widthOfTank, heightOfTank);
         g.fillRect(x-widthOfCannon/2, y - heightOfTank-lenghtOfCannon, widthOfCannon, lenghtOfCannon);
+
+        if(bullet.intersects(tank))
+            System.out.println("bum");
+
     }
 
 
@@ -119,7 +124,7 @@ public class Tank extends JPanel implements Runnable {
             long startTime = System.currentTimeMillis();
             setBulletCoordinates();
             System.out.println("szczal   " + xBullet);
-            if(xBullet>=widthOfPanel || xBullet<=-10 || yBullet<3 || yBullet>=500){
+            if(xBullet>=widthOfPanel*3 || xBullet<=-10 || yBullet<3 || yBullet>=1000){
                 bulletReleased = false;
                 readyToShot = false;
                 time = 0;
