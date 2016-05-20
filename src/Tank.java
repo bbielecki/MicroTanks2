@@ -20,8 +20,8 @@ public class Tank extends JPanel implements Runnable {
     private int strengthOfShot, angleOfShot;
     private double speedY=600, speedX=8;
     public long startTime, endTime, timeInterval;
-    private int time;
-    private int x,y,xDirection,xBullet,yBullet,xBulletDirection,yBulletDirection, widthOfPanel, heightOfPanel;
+    private double time;
+    private int x,y,xDirection,xBullet,yBullet,deltaX,xBulletDirection,yBulletDirection, widthOfPanel, heightOfPanel;
     private int currentTankStartPosition;
     private static final int g=50;
     private int[] yCoordinates;
@@ -50,6 +50,7 @@ public class Tank extends JPanel implements Runnable {
         lenghtOfCannon= 15;
         widthOfCannon= 3;
         sizeOfBullet=3;
+        deltaX=4;
         setDoubleBuffered(true);
     }
 
@@ -120,7 +121,7 @@ public class Tank extends JPanel implements Runnable {
             }
         }
         if(bulletReleased==true){
-            moveThread.sleep(1);
+
             long startTime = System.currentTimeMillis();
             setBulletCoordinates();
             System.out.println("szczal   " + xBullet);
@@ -133,12 +134,14 @@ public class Tank extends JPanel implements Runnable {
         //System.out.println(x+"   "+y);
     }
 
-    public void setBulletCoordinates(){
+    public void setBulletCoordinates() throws InterruptedException {
         double speed;
-        time+=1;
-        speed=-speedY+time*(double)g/2;
 
-        xBullet+=speedX;
+        time+=(double)deltaX/speedX;
+        moveThread.sleep((int)time);
+        System.out.println(time);
+        speed=-speedY+time*(double)g/2;
+        xBullet+=deltaX;
         yBullet=(int)((double)yBullet+speed/100);
     }
 
