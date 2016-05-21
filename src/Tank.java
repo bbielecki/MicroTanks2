@@ -137,11 +137,11 @@ public class Tank extends JPanel implements Runnable {
     public void setBulletCoordinates() throws InterruptedException {
         double speed;
 
-        time+=(double)deltaX/speedX;
-        moveThread.sleep((int)time);
+        time+=Math.abs((double)deltaX/speedX);
+        moveThread.sleep((int)Math.abs((double)deltaX/speedX));
         System.out.println(time);
         speed=-speedY+time*(double)g/2;
-        xBullet+=deltaX;
+        xBullet+=deltaX*Math.signum(speedX);
         yBullet=(int)((double)yBullet+speed/100);
     }
 
