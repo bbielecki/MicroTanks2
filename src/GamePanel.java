@@ -12,19 +12,21 @@ import java.util.Properties;
  *
  */
 public class GamePanel extends JPanel implements KeyListener {
+    private Font font1=new Font("Calibri",Font.BOLD,20), font2=new Font("Calibri",Font.BOLD,12);
+    private Tank[] tank;
+    private Tank currentTank;
+    Thread[] tankThreads;
+    private Player player1 = new Player(NewGame.getColor1(),NewGame.getName1());
+    private Player player2 = new Player(NewGame.getColor2(),NewGame.getName2());
+
     private int width,height;
     private int numberOfTanks=NewGame.getNumOfTanks();
     private int turnNumber=1;
     private long startTime;
-    private Tank[] tank;
-    private Tank currentTank;
-
-    Thread[] tankThreads;
-    private Player player1 = new Player(NewGame.getColor1(),NewGame.getName1());
-    private Player player2 = new Player(NewGame.getColor2(),NewGame.getName2());
     public Color firstColor=NewGame.getRealColor1(), secondColor=NewGame.getRealColor2();
-    private Font font1=new Font("Calibri",Font.BOLD,20), font2=new Font("Calibri",Font.BOLD,12);
+
     private int direction;
+    private boolean collisionDetected=false;
     /**
      * Konstruktor klasy <code>GamePanel</code> przyjmuje wartości szerokości i wysokości panelu rozgrywki.
      * @param x Szerokość panelu gry
@@ -112,7 +114,9 @@ public class GamePanel extends JPanel implements KeyListener {
         super.paintComponent(g);
         double x,x2,y,y2;
         int[] formax = new int[2];
+        int[] collisioCoordinates = new int[2];
         loadMap(formax);
+
 
         int[] groundCoordinates = new int[this.getWidth()+2];
         groundCoordinates=countGroundCoordinates(formax);
@@ -132,10 +136,15 @@ public class GamePanel extends JPanel implements KeyListener {
             }
             // line[i]=new Line2D.Double(x,y,x2,y2);
         }
+        // normowanie punktów
+        float xScale = (float) getWidth()/640;
+        float yScale = (float) getHeight()/380;
+        // skalowanie komponentów
+        ((Graphics2D) g).scale(xScale, yScale);
         g.setColor(Color.green);
         g.fillPolygon(ground);
         g.drawPolygon(ground);
-       // System.out.println(currentTank.getX()+"current Tank");
+        // System.out.println(currentTank.getX()+"current Tank");
         try {
             currentTank.move(direction);
         } catch (InterruptedException e) {
@@ -145,7 +154,22 @@ public class GamePanel extends JPanel implements KeyListener {
         for(int j=0;j<numberOfTanks;j++) {
             tank[j].setRandomY();
             tank[j].draw(g);
+
         }
+
+        collisioCoordinates=detectCollision(ground);
+
+        if(collisionDetected==true){
+
+            System.out.println("trafienie");
+            collisionDetected=false;
+        }
+
+        Collisons collison = new Collisons(getWidth(),getHeight(),g,collisioCoordinates[0],collisioCoordinates[1]);
+
+
+
+
         if(turnNumber%2==1) {
             g.setFont(font1);
             g.setColor(firstColor);
@@ -153,8 +177,8 @@ public class GamePanel extends JPanel implements KeyListener {
             g.drawString(Integer.toString(player1.getPoints()), getWidth() / 20, getHeight() / 20 + 20);
             g.setFont(font2);
             g.setColor(secondColor);
-            g.drawString(player2.getName(), 7 * getWidth() / 8, getHeight() / 20);
-            g.drawString(Integer.toString(player2.getPoints()), 7 * getWidth() / 8, getHeight() / 20 + 20);
+            g.drawString(player2.getName(), 5 * getWidth() / 8, getHeight() / 20);
+            g.drawString(Integer.toString(player2.getPoints()), 5 * getWidth() / 8, getHeight() / 20 + 20);
         }
         else {
             g.setFont(font2);
@@ -163,8 +187,8 @@ public class GamePanel extends JPanel implements KeyListener {
             g.drawString(Integer.toString(player1.getPoints()), getWidth() / 20, getHeight() / 20 + 20);
             g.setFont(font1);
             g.setColor(secondColor);
-            g.drawString(player2.getName(), 7 * getWidth() / 8, getHeight() / 20);
-            g.drawString(Integer.toString(player2.getPoints()), 7 * getWidth() / 8, getHeight() / 20 + 20);
+            g.drawString(player2.getName(), 5 * getWidth() / 8, getHeight() / 20);
+            g.drawString(Integer.toString(player2.getPoints()), 5 * getWidth() / 8, getHeight() / 20 + 20);
         }
 
 
@@ -181,6 +205,33 @@ public class GamePanel extends JPanel implements KeyListener {
         return groundCoordinates;
     }
 
+    private int[] detectCollision(Polygon ground){
+        int numberOfShootingTank=0;
+        int[] coordinatesOfCollison=new int[2];
+
+        for(int i=0;i<numberOfTanks;i++){
+            if(tank[i].isShooting())
+                numberOfShootingTank=i;
+        }
+
+        for(int i=0;i<numberOfTanks;i++){
+            if(tank[numberOfShootingTank].getBulletFigure().intersects(tank[i].getTankFigure())) {
+                System.out.println("czolg trafiony");
+                //collisionDetected = true;
+            }
+
+            if(ground.intersects(tank[numberOfShootingTank].getBulletFigure()))
+                System.out.println("ziemia trafiona");
+
+            if((tank[numberOfShootingTank].getBulletFigure().intersects(tank[i].getTankFigure())) || (ground.intersects(tank[numberOfShootingTank].getBulletFigure()))) {
+                collisionDetected = true;
+                coordinatesOfCollison[0]=tank[numberOfShootingTank].getXBullet();
+                coordinatesOfCollison[1]=tank[numberOfShootingTank].getyBullet();
+            }
+        }
+
+        return coordinatesOfCollison;
+    }
 
 
     public void setTanksCoordinates(int x)
@@ -256,8 +307,4 @@ public class GamePanel extends JPanel implements KeyListener {
         }
     }
 
-    public void turn (){
-
-
-    }
 }

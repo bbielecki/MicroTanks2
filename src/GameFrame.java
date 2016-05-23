@@ -1,4 +1,3 @@
-//region Import pakietów
 import sun.plugin2.util.ColorUtil;
 
 import javax.imageio.ImageIO;
@@ -42,7 +41,7 @@ public class GameFrame extends Frame
         this.width=width/2;
         this.height=height*3/4;
         earthGenerator = new EarthGenerator();
-        setPreferredSize(new Dimension(300,300));
+        setPreferredSize(new Dimension(800,600));
 
     }
 
@@ -60,14 +59,17 @@ public class GameFrame extends Frame
 
         frame.setLayout(new BorderLayout());
         frame.add(settingsPanel,BorderLayout.SOUTH);
+        frame.setMinimumSize(new Dimension(getWidth(),500));
         settingsPanel.setVisible(true);
         settingsPanel.setBorder(BorderFactory.createDashedBorder(Color.BLACK));
         Dimension dim = new Dimension(getWidth(),getHeight()/4);
         settingsPanel.setPreferredSize(dim);
         setSettingPanel(settingsPanel,frame,mainMenuframe);
 
+
         frame.add(gamePanel,BorderLayout.CENTER);
 
+        gamePanel.setLayout(new GridBagLayout());
         gamePanel.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 

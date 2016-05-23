@@ -14,6 +14,7 @@ import java.io.Console;
 
 public class Tank extends JPanel implements Runnable {
 
+    private Rectangle bulletFigure, tankFigure;
     private int widthOfTank, heightOfTank;
     private int lenghtOfCannon, widthOfCannon;
     private int sizeOfBullet;
@@ -52,6 +53,8 @@ public class Tank extends JPanel implements Runnable {
         sizeOfBullet=3;
         deltaX=4;
         setDoubleBuffered(true);
+        bulletFigure = new Rectangle(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon,sizeOfBullet,sizeOfBullet);
+        tankFigure = new Rectangle(x-widthOfTank/2, y-heightOfTank, widthOfTank, heightOfTank);
     }
 
     public void setyCoordinates(int yy,int i){
@@ -68,16 +71,18 @@ public class Tank extends JPanel implements Runnable {
      */
     public void draw(Graphics g) {
 
+
         g.setColor(Color.black);
-        Rectangle bullet=new Rectangle(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon,sizeOfBullet,sizeOfBullet);
+        bulletFigure.setLocation(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon);
         g.fillRect(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon, sizeOfBullet,sizeOfBullet);
 
-        Rectangle tank = new Rectangle(x-widthOfTank/2, y-heightOfTank, widthOfTank, heightOfTank);
+
         g.setColor(colorOfTank);
+        tankFigure.setLocation(x-widthOfTank/2, y-heightOfTank);
         g.fillRect(x-widthOfTank/2, y-heightOfTank, widthOfTank, heightOfTank);
         g.fillRect(x-widthOfCannon/2, y - heightOfTank-lenghtOfCannon, widthOfCannon, lenghtOfCannon);
 
-        if(bullet.intersects(tank))
+        if(bulletFigure.intersects(tankFigure))
             System.out.println("bum");
 
     }
@@ -125,7 +130,7 @@ public class Tank extends JPanel implements Runnable {
             long startTime = System.currentTimeMillis();
             setBulletCoordinates();
             System.out.println("szczal   " + xBullet);
-            if(xBullet>=widthOfPanel*3 || xBullet<=-10 || yBullet<3 || yBullet>=1000){
+            if(xBullet>=widthOfPanel*3 || xBullet<=-10 || yBullet<-100 || yBullet>=1000){
                 bulletReleased = false;
                 readyToShot = false;
                 time = 0;
@@ -136,12 +141,20 @@ public class Tank extends JPanel implements Runnable {
 
     public void setBulletCoordinates() throws InterruptedException {
         double speed;
+        double cnst=(double)deltaX/speedX;
 
-        time+=Math.abs((double)deltaX/speedX);
-        moveThread.sleep((int)Math.abs((double)deltaX/speedX));
+        if((speedX<0.001) && (speedX>-0.001))
+            cnst=1;
+
+        time+=Math.abs(cnst);
+        moveThread.sleep((long)Math.abs(cnst));
         System.out.println(time);
         speed=-speedY+time*(double)g/2;
-        xBullet+=deltaX*Math.signum(speedX);
+        if((speedX<0.001) && (speedX>-0.001))
+            xBullet+=0;
+        else
+            xBullet+=deltaX*Math.signum(speedX);
+
         yBullet=(int)((double)yBullet+speed/100);
     }
 
@@ -161,9 +174,14 @@ public class Tank extends JPanel implements Runnable {
     }
 
     public int getX(){return x;}
+    public int getXBullet(){return xBullet;}
+    public int getyBullet(){return yBullet;}
     public void setEndOfMove(boolean flag){endOfMove = flag;}
     public void setCurrentTankStartPosition(int pos){currentTankStartPosition=pos;}
     public void setReadyToShot(boolean ready) {readyToShot=ready;}
+    public boolean isShooting(){return bulletReleased;}
+    public Rectangle getBulletFigure(){return bulletFigure;}
+    public Rectangle getTankFigure(){return tankFigure;}
 
     public void setStrengthOfShot(int strength){
         strengthOfShot=strength;
