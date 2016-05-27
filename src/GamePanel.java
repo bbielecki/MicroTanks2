@@ -49,7 +49,7 @@ public class GamePanel extends JPanel implements KeyListener {
         for (int i=0;i<numberOfTanks;i++) {
             tankThreads[i]=new Thread(tank[i]);
             tank[i] = new Tank(width, 200, tankThreads[i]);
-            if(i%2==0)
+            if(i%2==0)                                             //parzyste numery czołgów należa do gracza nr 1, nieparzyste do gracza 2
                 tank[i].colorOfTank=firstColor;
             else
                 tank[i].colorOfTank=secondColor;
@@ -161,12 +161,10 @@ public class GamePanel extends JPanel implements KeyListener {
 
         if(collisionDetected==true){
 
+            Collisons collison = new Collisons(getWidth(),getHeight(),g,collisioCoordinates[0],collisioCoordinates[1]);
             System.out.println("trafienie");
             collisionDetected=false;
         }
-
-        Collisons collison = new Collisons(getWidth(),getHeight(),g,collisioCoordinates[0],collisioCoordinates[1]);
-
 
 
 
@@ -199,6 +197,7 @@ public class GamePanel extends JPanel implements KeyListener {
     public int[] countGroundCoordinates(int[] coefficient){
         int[] groundCoordinates = new int[this.getWidth()+2];
 
+
         for (int i = 1; i<this.getWidth()+2;i++) {
             groundCoordinates[i] =(int) (200 + coefficient[0] * Math.sin((double) (i) / 50) + coefficient[1]);
         }
@@ -208,6 +207,7 @@ public class GamePanel extends JPanel implements KeyListener {
     private int[] detectCollision(Polygon ground){
         int numberOfShootingTank=0;
         int[] coordinatesOfCollison=new int[2];
+        int numberOfAttacedTank=0;
 
         for(int i=0;i<numberOfTanks;i++){
             if(tank[i].isShooting())
@@ -217,7 +217,12 @@ public class GamePanel extends JPanel implements KeyListener {
         for(int i=0;i<numberOfTanks;i++){
             if(tank[numberOfShootingTank].getBulletFigure().intersects(tank[i].getTankFigure())) {
                 System.out.println("czolg trafiony");
+                numberOfAttacedTank=i;
                 //collisionDetected = true;
+                if(numberOfShootingTank%2==0)
+                    player1.addPoints(countingTheNumberOfScoredPoints(numberOfShootingTank, numberOfAttacedTank, false));
+                if(numberOfShootingTank%2==1)
+                    player2.addPoints(countingTheNumberOfScoredPoints(numberOfShootingTank, numberOfAttacedTank, true));
             }
 
             if(ground.intersects(tank[numberOfShootingTank].getBulletFigure()))
@@ -225,12 +230,25 @@ public class GamePanel extends JPanel implements KeyListener {
 
             if((tank[numberOfShootingTank].getBulletFigure().intersects(tank[i].getTankFigure())) || (ground.intersects(tank[numberOfShootingTank].getBulletFigure()))) {
                 collisionDetected = true;
+                numberOfAttacedTank=i;
                 coordinatesOfCollison[0]=tank[numberOfShootingTank].getXBullet();
                 coordinatesOfCollison[1]=tank[numberOfShootingTank].getyBullet();
             }
         }
 
         return coordinatesOfCollison;
+    }
+
+    public int countingTheNumberOfScoredPoints(int numberOfShootingTank, int numberOfAttacedTank, boolean FirstOrSecondPlayer){
+        double points=0.0;
+
+        if(FirstOrSecondPlayer || (numberOfAttacedTank==numberOfShootingTank))
+            points=-((double)10000/(Math.abs((tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())*(tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX()))))*10;
+        else
+            points=((double)10000/(tank[numberOfAttacedTank].getX()*tank[numberOfAttacedTank].getX()))*10;
+
+        System.out.println(points + " czolg " + numberOfShootingTank);
+        return (int)points;
     }
 
 

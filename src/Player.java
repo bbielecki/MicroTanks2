@@ -16,5 +16,6 @@ public class Player
 
     public String getTankColour() {return tankColour;}
     public String getName() {return name;}
+    public void addPoints(int addedPoints){points=points+addedPoints;}
     public int getPoints() {return points;}
 }
