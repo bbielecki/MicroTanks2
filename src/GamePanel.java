@@ -220,9 +220,9 @@ public class GamePanel extends JPanel implements KeyListener {
                 numberOfAttacedTank=i;
                 //collisionDetected = true;
                 if(numberOfShootingTank%2==0)
-                    player1.addPoints(countingTheNumberOfScoredPoints(numberOfShootingTank, numberOfAttacedTank, false));
+                    player1.addPoints(countingTheNumberOfScoredPoints(numberOfShootingTank, numberOfAttacedTank));
                 if(numberOfShootingTank%2==1)
-                    player2.addPoints(countingTheNumberOfScoredPoints(numberOfShootingTank, numberOfAttacedTank, true));
+                    player2.addPoints(countingTheNumberOfScoredPoints(numberOfShootingTank, numberOfAttacedTank));
             }
 
             if(ground.intersects(tank[numberOfShootingTank].getBulletFigure()))
@@ -239,13 +239,13 @@ public class GamePanel extends JPanel implements KeyListener {
         return coordinatesOfCollison;
     }
 
-    public int countingTheNumberOfScoredPoints(int numberOfShootingTank, int numberOfAttacedTank, boolean FirstOrSecondPlayer){
+    public int countingTheNumberOfScoredPoints(int numberOfShootingTank, int numberOfAttacedTank){
         double points=0.0;
 
-        if(FirstOrSecondPlayer || (numberOfAttacedTank==numberOfShootingTank))
+        if((numberOfAttacedTank==numberOfShootingTank))
             points=-((double)10000/(Math.abs((tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())*(tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX()))))*10;
         else
-            points=((double)10000/(tank[numberOfAttacedTank].getX()*tank[numberOfAttacedTank].getX()))*10;
+            points=((double)10000/((tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())*(tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())))*10;
 
         System.out.println(points + " czolg " + numberOfShootingTank);
         return (int)points;
