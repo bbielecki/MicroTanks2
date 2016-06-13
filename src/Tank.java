@@ -27,7 +27,7 @@ public class Tank extends JPanel implements Runnable {
     private static final int g=50;
     private int[] yCoordinates;
     private Thread moveThread;
-    private boolean bulletReleased=false,readyToShot=false, endOfMove=true;
+    private boolean bulletReleased=false,readyToShot=false, endOfMove=true, collisionsDetected=false;
     public Color colorOfTank;
 
     /**
@@ -70,8 +70,6 @@ public class Tank extends JPanel implements Runnable {
      * @param g Kontekst graficzny
      */
     public void draw(Graphics g) {
-
-
         g.setColor(Color.black);
         bulletFigure.setLocation(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon);
         g.fillRect(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon, sizeOfBullet,sizeOfBullet);
@@ -102,7 +100,12 @@ public class Tank extends JPanel implements Runnable {
 
         if (bulletReleased==false && endOfMove==false) {
             time=0;
-            x += dir;
+            if(!collisionsDetected)
+                x += dir;
+            else {
+                x = x;
+                moveThread.sleep(1000);
+            }
             xBullet=x;
             yBullet=y;
             if (x <= 1) {
@@ -128,7 +131,19 @@ public class Tank extends JPanel implements Runnable {
         if(bulletReleased==true){
 
             long startTime = System.currentTimeMillis();
-            setBulletCoordinates();
+            if(!collisionsDetected) {
+                setBulletCoordinates();
+            }
+            else {
+                xBullet=widthOfPanel*2;
+                moveThread.sleep(500);
+
+                collisionsDetected=false;
+                bulletReleased = false;
+                readyToShot = false;
+                time = 0;
+            }
+
             System.out.println("szczal   " + xBullet);
             if(xBullet>=widthOfPanel*3 || xBullet<=-10 || yBullet<-100 || yBullet>=1000){
                 bulletReleased = false;
@@ -179,6 +194,7 @@ public class Tank extends JPanel implements Runnable {
     public void setEndOfMove(boolean flag){endOfMove = flag;}
     public void setCurrentTankStartPosition(int pos){currentTankStartPosition=pos;}
     public void setReadyToShot(boolean ready) {readyToShot=ready;}
+    public void setCollisionsDetected(boolean CD) {collisionsDetected=CD;}
     public boolean isShooting(){return bulletReleased;}
     public Rectangle getBulletFigure(){return bulletFigure;}
     public Rectangle getTankFigure(){return tankFigure;}

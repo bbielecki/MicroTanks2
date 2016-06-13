@@ -1,10 +1,14 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 
 /**
@@ -27,6 +31,8 @@ public class GamePanel extends JPanel implements KeyListener {
 
     private int direction;
     private boolean collisionDetected=false;
+
+    private Image bImage;
     /**
      * Konstruktor klasy <code>GamePanel</code> przyjmuje wartości szerokości i wysokości panelu rozgrywki.
      * @param x Szerokość panelu gry
@@ -42,7 +48,35 @@ public class GamePanel extends JPanel implements KeyListener {
         createTanks(tank);
         setDoubleBuffered(true);
         setFocusable(true);
+        try {
+            URL url = new URL("https://i.kinja-img.com/gawker-media/image/upload/s--wau7KSN4--/c_fit,fl_progressive,q_80,w_636/18bl3j27axli8jpg.jpg");
+            bImage = ImageIO.read(url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+    }
+
+    public int checkTurnNumber(){
+        if(turnNumber%2==1)
+            return 0;
+        else
+            return 1;
+    }
+
+    public void changeNumberOfMoves(int firstOrSecond){
+        if(firstOrSecond==0)
+            player1.oneMove();
+        else
+            player2.oneMove();
+    }
+    public int checkNumberOfMoves(int firstOrSecond){
+        if(firstOrSecond==0)
+            return player1.checkNumberOfMoves();
+        else
+            return player2.checkNumberOfMoves();
     }
 
     public Tank[] createTanks(Tank[] tank){
@@ -66,6 +100,7 @@ public class GamePanel extends JPanel implements KeyListener {
         System.out.println("teraz czolg"+currentTank.getX());
         //currentTank.addNotify();
         currentTank.setReadyToShot(true);
+        currentTank.setCollisionsDetected(false);
         repaint();
     }
     public void moveOfTank(int dir) throws InterruptedException {
@@ -92,7 +127,6 @@ public class GamePanel extends JPanel implements KeyListener {
         System.out.println("zmiana"+turnNumber + "    "+numberOfTanks);
         if(turnNumber<numberOfTanks) {
             turnNumber+=1;
-
         }
         else
             turnNumber=1;
@@ -154,19 +188,14 @@ public class GamePanel extends JPanel implements KeyListener {
         for(int j=0;j<numberOfTanks;j++) {
             tank[j].setRandomY();
             tank[j].draw(g);
-
         }
 
-        collisioCoordinates=detectCollision(ground);
-
+        collisioCoordinates=detectCollision(ground);//wykrycie kolizji z ziemia i innymi czolgami
         if(collisionDetected==true){
-
-            Collisons collison = new Collisons(getWidth(),getHeight(),g,collisioCoordinates[0],collisioCoordinates[1]);
+            Collisions collision = new Collisions(getWidth(),getHeight(),g,collisioCoordinates[0],collisioCoordinates[1], bImage);
             System.out.println("trafienie");
             collisionDetected=false;
         }
-
-
 
         if(turnNumber%2==1) {
             g.setFont(font1);
@@ -219,17 +248,25 @@ public class GamePanel extends JPanel implements KeyListener {
                 System.out.println("czolg trafiony");
                 numberOfAttacedTank=i;
                 //collisionDetected = true;
-                if(numberOfShootingTank%2==0)
+                if(numberOfShootingTank%2==0) {
+                    tank[numberOfShootingTank].setCollisionsDetected(true);
                     player1.addPoints(countingTheNumberOfScoredPoints(numberOfShootingTank, numberOfAttacedTank));
-                if(numberOfShootingTank%2==1)
+                }
+                if(numberOfShootingTank%2==1) {
+                    tank[numberOfShootingTank].setCollisionsDetected(true);
                     player2.addPoints(countingTheNumberOfScoredPoints(numberOfShootingTank, numberOfAttacedTank));
+                }
             }
 
-            if(ground.intersects(tank[numberOfShootingTank].getBulletFigure()))
+            if(ground.intersects(tank[numberOfShootingTank].getBulletFigure())) {
                 System.out.println("ziemia trafiona");
+                tank[numberOfShootingTank].setCollisionsDetected(true);
+               // collisionDetected=false;
+            }
 
             if((tank[numberOfShootingTank].getBulletFigure().intersects(tank[i].getTankFigure())) || (ground.intersects(tank[numberOfShootingTank].getBulletFigure()))) {
                 collisionDetected = true;
+                tank[numberOfShootingTank].setCollisionsDetected(true);
                 numberOfAttacedTank=i;
                 coordinatesOfCollison[0]=tank[numberOfShootingTank].getXBullet();
                 coordinatesOfCollison[1]=tank[numberOfShootingTank].getyBullet();
@@ -243,9 +280,9 @@ public class GamePanel extends JPanel implements KeyListener {
         double points=0.0;
 
         if((numberOfAttacedTank==numberOfShootingTank))
-            points=-((double)10000/(Math.abs((tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())*(tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX()))))*10;
+            points=-((double)100/(Math.abs((tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())*(tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX()))))*10;
         else
-            points=((double)10000/((tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())*(tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())))*10;
+            points=((double)100/((tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())*(tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())))*10;
 
         System.out.println(points + " czolg " + numberOfShootingTank);
         return (int)points;

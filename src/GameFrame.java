@@ -88,7 +88,7 @@ public class GameFrame extends Frame
     private JPanel setSettingPanel(JPanel setPanel, JFrame gameFrame, JFrame mainMenuFrame){
         JButton shoot = new JButton("fire!"), nextTurn=new JButton("Next Turn");
         JButton right, left, rightAngle, leftAngle, rightPower, leftPower, backButton;
-        JTextField move, angle,angleMeasure, power, powerMeasure;
+        JTextField move, angle,angleMeasure, power, powerMeasure, numberOfMoves;
         JPanel weaponAndBackPanel,anglePanel,movePanel,powerPanel,backPanel, weaponPanel;
         Choice weapons;
         setPanel.setLayout(new GridLayout(2,2));
@@ -158,12 +158,18 @@ public class GameFrame extends Frame
             powerMeasure.setForeground(Color.black);
             powerMeasure.setBackground(new Color(119,166,206));
             powerMeasure.setBorder(BorderFactory.createEmptyBorder());
+            numberOfMoves=new JTextField("5 moves left");
+            numberOfMoves.setFont(ft2);
+            numberOfMoves.setForeground(Color.black);
+            numberOfMoves.setBackground(new Color(119,166,206));
+            numberOfMoves.setBorder(BorderFactory.createEmptyBorder());
             weapons = new Choice();
             weapons.add("weapon1");
 
             movePanel.add(move);
             movePanel.add(left);
             movePanel.add(right);
+            movePanel.add(numberOfMoves);
             anglePanel.add(angle);
             anglePanel.add(leftAngle);
             anglePanel.add(angleMeasure);
@@ -185,6 +191,7 @@ public class GameFrame extends Frame
             setPanel.add(weaponAndBackPanel);
 
             movePanel.setVisible(true);
+            numberOfMoves.setVisible(true);
             weaponAndBackPanel.setVisible(true);
             backPanel.setVisible(true);
             weaponPanel.setVisible(true);
@@ -226,6 +233,8 @@ public class GameFrame extends Frame
                 public void actionPerformed(ActionEvent e) {
                     gamePanel.nextTurn();
                     gamePanel.requestFocus();
+
+                    numberOfMoves.setText(gamePanel.checkNumberOfMoves(gamePanel.checkTurnNumber()) + " moves left");
                 }
             });
 
@@ -247,8 +256,13 @@ public class GameFrame extends Frame
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        gamePanel.moveOfTank(1);
-                        gamePanel.requestFocus();
+                        if(gamePanel.checkNumberOfMoves(gamePanel.checkTurnNumber())!=0) {
+                            gamePanel.moveOfTank(1);
+                            gamePanel.requestFocus();
+                            gamePanel.changeNumberOfMoves(gamePanel.checkTurnNumber());
+
+                            numberOfMoves.setText(gamePanel.checkNumberOfMoves(gamePanel.checkTurnNumber()) + " moves left");
+                        }
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
                     }
@@ -259,8 +273,13 @@ public class GameFrame extends Frame
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        gamePanel.moveOfTank(-1);
-                        gamePanel.requestFocus();
+                        if(gamePanel.checkNumberOfMoves(gamePanel.checkTurnNumber())!=0) {
+                            gamePanel.moveOfTank(-1);
+                            gamePanel.requestFocus();
+                            gamePanel.changeNumberOfMoves(gamePanel.checkTurnNumber());
+
+                            numberOfMoves.setText(gamePanel.checkNumberOfMoves(gamePanel.checkTurnNumber()) + " moves left");
+                        }
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
                     }
