@@ -29,6 +29,9 @@ public class Tank extends JPanel implements Runnable {
     private Thread moveThread;
     private boolean bulletReleased=false,readyToShot=false, endOfMove=true, collisionsDetected=false;
     public Color colorOfTank;
+    private int level=1;
+    private Weapon weapon;
+    private int choosenWeapon = 2;
 
     /**
      * Konstruktor klasy <code>Tank</code> tworzy czołg w zależności od współrzędnych,
@@ -55,6 +58,7 @@ public class Tank extends JPanel implements Runnable {
         setDoubleBuffered(true);
         bulletFigure = new Rectangle(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon,sizeOfBullet,sizeOfBullet);
         tankFigure = new Rectangle(x-widthOfTank/2, y-heightOfTank, widthOfTank, heightOfTank);
+        weapon = new Weapon();
     }
 
     public void setyCoordinates(int yy,int i){
@@ -70,18 +74,54 @@ public class Tank extends JPanel implements Runnable {
      * @param g Kontekst graficzny
      */
     public void draw(Graphics g) {
-        g.setColor(Color.black);
-        bulletFigure.setLocation(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon);
-        g.fillRect(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon, sizeOfBullet,sizeOfBullet);
+        //bulletFigure.setLocation(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon);
 
+        switch (choosenWeapon) {
+            case 1: {
+                bulletFigure.setLocation(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon);
+                g.setColor(Color.black);
+                g.fillRect((int) bulletFigure.getX(), (int) bulletFigure.getY(), (int) bulletFigure.getWidth(), (int) bulletFigure.getHeight());
+                break;
+            }
+            case 2: {
+                bulletFigure.setLocation(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon);
+                g.setColor(Color.black);
+                bulletFigure.setSize(sizeOfBullet*3,sizeOfBullet*3);
+                g.fillRect((int)bulletFigure.getX(),(int)bulletFigure.getY(),(int)bulletFigure.getWidth(),(int)bulletFigure.getHeight());
+                break;
+            }
+            case 3:{
+                g.setColor(Color.red);
+                bulletFigure.setSize(sizeOfBullet,sizeOfBullet);
+                if(bulletReleased) {
+                    bulletFigure.setLocation(xBullet - widthOfCannon / 2, (int) (yBullet - heightOfTank - lenghtOfCannon - ((yBullet - heightOfTank - lenghtOfCannon )*Math.sin((xBullet - widthOfCannon / 2) / 50))));
+                    g.fillRect(xBullet-widthOfCannon/2,(int)(yBullet-heightOfTank-lenghtOfCannon-(((yBullet-heightOfTank-lenghtOfCannon)*Math.sin((xBullet-widthOfCannon/2)/50)))),(int)bulletFigure.getWidth(),(int)bulletFigure.getHeight());
+                }
+                break;
+            }
+            case 4:{
+
+
+
+                break;
+            }
+
+
+
+            default: {
+                g.setColor(Color.black);
+                g.fillRect((int) bulletFigure.getX(), (int) bulletFigure.getY(), (int) bulletFigure.getWidth(), (int) bulletFigure.getHeight());
+                break;
+            }
+        }
 
         g.setColor(colorOfTank);
         tankFigure.setLocation(x-widthOfTank/2, y-heightOfTank);
         g.fillRect(x-widthOfTank/2, y-heightOfTank, widthOfTank, heightOfTank);
         g.fillRect(x-widthOfCannon/2, y - heightOfTank-lenghtOfCannon, widthOfCannon, lenghtOfCannon);
 
-        if(bulletFigure.intersects(tankFigure))
-            System.out.println("bum");
+     //   if(bulletFigure.intersects(tankFigure))
+       //     System.out.println("bum");
 
     }
 
@@ -136,6 +176,7 @@ public class Tank extends JPanel implements Runnable {
             }
             else {
                 xBullet=widthOfPanel*2;
+                yBullet=-heightOfPanel;
                 moveThread.sleep(500);
 
                 collisionsDetected=false;
@@ -195,6 +236,7 @@ public class Tank extends JPanel implements Runnable {
     public void setCurrentTankStartPosition(int pos){currentTankStartPosition=pos;}
     public void setReadyToShot(boolean ready) {readyToShot=ready;}
     public void setCollisionsDetected(boolean CD) {collisionsDetected=CD;}
+    public void setChoosenWepon(int chWeap){choosenWeapon=chWeap;}
     public boolean isShooting(){return bulletReleased;}
     public Rectangle getBulletFigure(){return bulletFigure;}
     public Rectangle getTankFigure(){return tankFigure;}

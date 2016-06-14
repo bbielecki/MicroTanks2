@@ -119,7 +119,7 @@ public class GamePanel extends JPanel implements KeyListener {
         currentTank.setAngleOfShot(angle);
     }
 
-    public void setStregth(int strength){
+    public void setStrength(int strength){
         currentTank.setStrengthOfShot(strength);
     }
 
@@ -278,12 +278,20 @@ public class GamePanel extends JPanel implements KeyListener {
 
     public int countingTheNumberOfScoredPoints(int numberOfShootingTank, int numberOfAttacedTank){
         double points=0.0;
+        double p=((double)100/(Math.abs((tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())*(tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX()))))*10;
+        if((p<100 )&&(p>-100)){
 
-        if((numberOfAttacedTank==numberOfShootingTank))
-            points=-((double)100/(Math.abs((tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())*(tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX()))))*10;
-        else
-            points=((double)100/((tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())*(tank[numberOfShootingTank].getXBullet()-tank[numberOfAttacedTank].getX())))*10;
-
+            if ((numberOfAttacedTank == numberOfShootingTank) || (numberOfShootingTank % 2 == numberOfAttacedTank % 2))
+                points = -p;
+            else
+                points = p;
+        }
+        else {
+            if ((numberOfAttacedTank == numberOfShootingTank) || (numberOfShootingTank % 2 == numberOfAttacedTank % 2))
+                points = -100;
+            else
+                points = 100;
+        }
         System.out.println(points + " czolg " + numberOfShootingTank);
         return (int)points;
     }

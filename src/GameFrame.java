@@ -148,12 +148,12 @@ public class GameFrame extends Frame
             power.setFont(ft);
             power.setForeground(new Color(8,124,89));
             power.setBackground(new Color(119,166,206));
-            angleMeasure = new JTextField("number");
+            angleMeasure = new JTextField("145");
             angleMeasure.setFont(ft2);
             angleMeasure.setForeground(Color.black);
             angleMeasure.setBackground(new Color(119,166,206));
             angleMeasure.setBorder(BorderFactory.createEmptyBorder());
-            powerMeasure = new JTextField("number");
+            powerMeasure = new JTextField("100");
             powerMeasure.setFont(ft2);
             powerMeasure.setForeground(Color.black);
             powerMeasure.setBackground(new Color(119,166,206));
@@ -242,7 +242,7 @@ public class GameFrame extends Frame
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     gamePanel.setAngle(Integer.parseInt(angleMeasure.getText()));
-                    gamePanel.setStregth(Integer.parseInt(powerMeasure.getText()));
+                    gamePanel.setStrength(Integer.parseInt(powerMeasure.getText()));
 
                     gamePanel.shot();
 
@@ -250,6 +250,35 @@ public class GameFrame extends Frame
                 }
             });
 
+            rightAngle.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    gamePanel.setAngle(Integer.parseInt(angleMeasure.getText())+1);
+                    angleMeasure.setText(""+(Integer.parseInt(angleMeasure.getText())+1)+"");
+                }
+            });
+            leftAngle.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    gamePanel.setAngle(Integer.parseInt(angleMeasure.getText())-1);
+                    angleMeasure.setText(""+(Integer.parseInt(angleMeasure.getText())-1)+"");
+                }
+            });
+
+            rightPower.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gamePanel.setStrength(Integer.parseInt(powerMeasure.getText())+1);
+                powerMeasure.setText(""+(Integer.parseInt(powerMeasure.getText())+1));
+            }
+            });
+            leftPower.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    gamePanel.setStrength(Integer.parseInt(powerMeasure.getText())-1);
+                    powerMeasure.setText(""+(Integer.parseInt(powerMeasure.getText())-1));
+                }
+            });
 
 
             right.addActionListener(new ActionListener() {
@@ -285,8 +314,6 @@ public class GameFrame extends Frame
                     }
                 }
             });
-
-
 
 
         }
