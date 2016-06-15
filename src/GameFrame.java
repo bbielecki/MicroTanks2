@@ -237,6 +237,7 @@ public class GameFrame extends Frame
                     gamePanel.requestFocus();
                     gamePanel.endOfLevel++;
                     numberOfMoves.setText(gamePanel.checkNumberOfMoves(gamePanel.checkTurnNumber()) + " moves left");
+                    gamePanel.repaint();
                 }
             });
 

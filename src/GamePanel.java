@@ -33,7 +33,7 @@ public class GamePanel extends JPanel implements KeyListener {
 
     private int direction;
     public int endOfLevel = 1;
-    private boolean collisionDetected = false;
+    private boolean collisionDetected = false, levelHasAlreadyChanged = false;
 
 
     private Image bImage;
@@ -171,6 +171,8 @@ public class GamePanel extends JPanel implements KeyListener {
         int[] formax = new int[2];
         Font big = new Font("Calibri", Font.BOLD,35);
         int[] collisioCoordinates = new int[2];
+        //levelHasAlreadyChanged=false;
+
         if (endOfLevel == 5) {
            /* for (int i = 5; i >= 1; i--) {
                 try {
@@ -185,6 +187,7 @@ public class GamePanel extends JPanel implements KeyListener {
             }*/
             player1.resetAll();
             player2.resetAll();
+            levelHasAlreadyChanged=true;
             endOfLevel = 1;
             level++;
         }
@@ -229,7 +232,7 @@ public class GamePanel extends JPanel implements KeyListener {
         }
 
         collisioCoordinates = detectCollision(ground);//wykrycie kolizji z ziemia i innymi czolgami
-        if (collisionDetected == true) {
+        if (collisionDetected) {
             Collisions collision = new Collisions(getWidth(), getHeight(), g, collisioCoordinates[0], collisioCoordinates[1], bImage);
             System.out.println("trafienie");
             collisionDetected = false;
@@ -261,6 +264,12 @@ public class GamePanel extends JPanel implements KeyListener {
             g.drawString(Integer.toString(player2.getPoints()), 5 * getWidth() / 8, getHeight() / 20 + 20);
             g.drawString(Integer.toString(player2.getHit()), 5 * getWidth() / 8, getHeight() /20 + 40);
             g.drawString(Integer.toString(player2.getAllShots()), 5 * getWidth() / 8, getHeight() /20 + 60);
+        }
+
+
+        if(levelHasAlreadyChanged) {
+            weaponUpdate();
+            levelHasAlreadyChanged = false;
         }
 
         repaint();
@@ -372,6 +381,7 @@ public class GamePanel extends JPanel implements KeyListener {
                 }
                 form[0] = Integer.parseInt(a);
                 form[1] = Integer.parseInt(b);
+
                 break;
             }
 
@@ -390,7 +400,7 @@ public class GamePanel extends JPanel implements KeyListener {
                 form[0] = Integer.parseInt(a);
                 form[1] = Integer.parseInt(b);
 
-                weaponUpdate();
+
                 break;
             }
             case 3:
@@ -408,7 +418,6 @@ public class GamePanel extends JPanel implements KeyListener {
                 form[0] = Integer.parseInt(a);
                 form[1] = Integer.parseInt(b);
 
-                weaponUpdate();
                 break;
             }
         }
