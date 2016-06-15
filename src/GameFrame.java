@@ -217,6 +217,8 @@ public class GameFrame extends Frame
             setPanel.setFocusable(false);
             gamePanel.setFocusable(true);
 
+
+
             backButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -233,7 +235,7 @@ public class GameFrame extends Frame
                 public void actionPerformed(ActionEvent e) {
                     gamePanel.nextTurn();
                     gamePanel.requestFocus();
-
+                    gamePanel.endOfLevel++;
                     numberOfMoves.setText(gamePanel.checkNumberOfMoves(gamePanel.checkTurnNumber()) + " moves left");
                 }
             });
@@ -243,12 +245,15 @@ public class GameFrame extends Frame
                 public void actionPerformed(ActionEvent e) {
                     gamePanel.setAngle(Integer.parseInt(angleMeasure.getText()));
                     gamePanel.setStrength(Integer.parseInt(powerMeasure.getText()));
-
                     gamePanel.shot();
-
                     gamePanel.requestFocus();
+                    if (gamePanel.getTurnNumber() % 2 == 1) {
+                        gamePanel.getPlayer1().addShot();
+                    }
+                    else gamePanel.getPlayer2().addShot();
                 }
             });
+
 
             rightAngle.addActionListener(new ActionListener() {
                 @Override
@@ -266,11 +271,11 @@ public class GameFrame extends Frame
             });
 
             rightPower.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                gamePanel.setStrength(Integer.parseInt(powerMeasure.getText())+1);
-                powerMeasure.setText(""+(Integer.parseInt(powerMeasure.getText())+1));
-            }
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    gamePanel.setStrength(Integer.parseInt(powerMeasure.getText())+1);
+                    powerMeasure.setText(""+(Integer.parseInt(powerMeasure.getText())+1));
+                }
             });
             leftPower.addActionListener(new ActionListener() {
                 @Override

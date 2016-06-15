@@ -113,8 +113,8 @@ public class NewGame extends Frame {
 
 
         Choice jaco2 = new Choice();
-        jaco2.add("Czerwony");
         jaco2.add("Niebieski");
+        jaco2.add("Czerwony");
         jaco2.add("Zielony");
         jaco2.setBounds(width / 6 +buttonWidth*2, height / 9 +(3*buttonHeight+3*2),buttonWidth/2,buttonHeight/2);
         jaco2.setVisible(true);

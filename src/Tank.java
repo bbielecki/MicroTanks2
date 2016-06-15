@@ -250,6 +250,11 @@ public class Tank extends JPanel implements Runnable {
         angleOfShot=angle;
     }
 
+    public void weaponCoordinatesUpdate(){
+        xBullet=x;
+        yBullet=y;
+    }
+
 
     /**
      * Metoda zdarzeniowa z interfejsu Runnable wykonująca wątek.

@@ -22,6 +22,9 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
 
+        Client client=new Client();
+        for(int i=1;i<=3;i++)
+            client.getLevelMap(i);
         MainMenu mainMenu = new MainMenu();
         JFrame mainMenuFrame= mainMenu.createAFrame(mainMenu.getWidth(),mainMenu.getHeight(),"Main Menu");
         mainMenuFrame.setForeground(new Color(21,185,125));
