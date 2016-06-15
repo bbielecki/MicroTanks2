@@ -28,7 +28,7 @@ public class GamePanel extends JPanel implements KeyListener {
     private Player player2 = new Player(NewGame.getColor2(), NewGame.getName2());
     private Timer t;
     private JProgressBar jp;
-    private int width, height;
+    private int width, height, defaultWidth, defaultHeight;
     private int numberOfTanks = NewGame.getNumOfTanks();
     private int turnNumber = 1;
     private long startTime;
@@ -36,7 +36,7 @@ public class GamePanel extends JPanel implements KeyListener {
 
     private int direction;
     public int endOfLevel = 1, timerV = 0;
-    private boolean collisionDetected = false, levelHasAlreadyChanged = false, drawStopText = false;
+    private boolean collisionDetected = false, levelHasAlreadyChanged = false, drawStopText = false, setDefoultSize=false;
     JButton left, right,shoot, backButton, nextTurn;
 
 
@@ -52,6 +52,7 @@ public class GamePanel extends JPanel implements KeyListener {
     public GamePanel(int x, int y) {
         width = x;
         height = y;
+
         setPreferredSize(new Dimension(width, height));
         tank = new Tank[numberOfTanks];
         tankThreads = new Thread[numberOfTanks];
@@ -68,6 +69,7 @@ public class GamePanel extends JPanel implements KeyListener {
             e.printStackTrace();
         }
 
+        setDefoultSize=true;
     }
 
     public int checkTurnNumber() {
@@ -178,6 +180,11 @@ public class GamePanel extends JPanel implements KeyListener {
     @Override
     public void paintComponent(Graphics g)
     {
+        if(setDefoultSize){
+            defaultWidth=this.getWidth();
+            defaultHeight=this.getHeight();
+            setDefoultSize=false;
+        }
         super.paintComponent(g);
         double x, x2, y, y2;
 
@@ -198,6 +205,7 @@ public class GamePanel extends JPanel implements KeyListener {
                         t.stop();
                         jp.setVisible(false);
                         timerV = 0;
+                        drawStopText = true;
                     }
                     else
                     {
@@ -213,7 +221,7 @@ public class GamePanel extends JPanel implements KeyListener {
             jp.setStringPainted(true);
             this.add(jp);
             jp.setVisible(true);
-            jp.setBounds(getWidth()/3,getHeight()/3,300,100);
+            jp.setBounds(defaultWidth/2-defaultWidth/8,defaultHeight/2-defaultHeight/8,defaultWidth/4,defaultHeight/4);
 
 
             player1.resetAll();
@@ -221,7 +229,7 @@ public class GamePanel extends JPanel implements KeyListener {
             endOfLevel = 1;
             level++;
 
-            drawStopText = true;
+
         }
 
         loadMap(formax);
@@ -244,8 +252,12 @@ public class GamePanel extends JPanel implements KeyListener {
             // line[i]=new Line2D.Double(x,y,x2,y2);
         }
         // normowanie punktów
-        float xScale = (float) getWidth() / 640;
-        float yScale = (float) getHeight() / 380;
+       // float xScale = (float) getWidth() / 640;
+      //  float yScale = (float) getHeight() / 380;
+
+        float xScale = (float) this.getWidth() / defaultWidth;
+        float yScale = (float) this.getHeight() / defaultHeight;
+
         // skalowanie komponentów
         ((Graphics2D) g).scale(xScale, yScale);
         g.setColor(Color.green);
@@ -272,37 +284,38 @@ public class GamePanel extends JPanel implements KeyListener {
 
         if(drawStopText){
             String text="To start new Level, please press space";
-            g.setColor(Color.black);
+            g.setColor(Color.red);
             g.setFont(font1);
-            g.drawString(text,getWidth()/5,getHeight()/10);
+            g.drawString(text,defaultWidth/5,defaultHeight/10);
         }
 
+        double b= 0.8, a=0.05;
         if (turnNumber % 2 == 1) {
             g.setFont(font1);
             g.setColor(firstColor);
-            g.drawString(player1.getName(), getWidth() / 20, getHeight() / 20);
-            g.drawString(Integer.toString(player1.getPoints()), getWidth() / 20, getHeight() / 20 + 20);
-            g.drawString(Integer.toString(player1.getHit()), getWidth() / 20, getHeight() /20 + 40);
-            g.drawString(Integer.toString(player1.getAllShots()),getWidth() / 20, getHeight() /20 + 60);
+            g.drawString(player1.getName(), (int)(defaultWidth*a), (int)(defaultHeight*a));
+            g.drawString(Integer.toString(player1.getPoints()), (int)(defaultWidth*a), (int)(defaultHeight*a+20));
+            g.drawString(Integer.toString(player1.getHit()), (int)(defaultWidth*a), (int)(defaultHeight*a+40));
+            g.drawString(Integer.toString(player1.getAllShots()),(int)(defaultWidth*a), (int)(defaultHeight*a+60));
             g.setFont(font2);
             g.setColor(secondColor);
-            g.drawString(player2.getName(), 5 * getWidth() / 8, getHeight() / 20);
-            g.drawString(Integer.toString(player2.getPoints()), 5 * getWidth() / 8, getHeight() / 20 + 20);
-            g.drawString(Integer.toString(player2.getHit()), 5 * getWidth() / 8, getHeight() /20 + 40);
-            g.drawString(Integer.toString(player2.getAllShots()), 5 * getWidth() / 8, getHeight() /20 + 60);
+            g.drawString(player2.getName(),(int)(defaultWidth*b), (int)(defaultHeight*a));
+            g.drawString(Integer.toString(player2.getPoints()), (int)(defaultWidth*b), (int)(defaultHeight*a+20));
+            g.drawString(Integer.toString(player2.getHit()), (int)(defaultWidth*b), (int)(defaultHeight*a+40));
+            g.drawString(Integer.toString(player2.getAllShots()), (int)(defaultWidth*b), (int)(defaultHeight*a+60));
         } else {
             g.setFont(font2);
             g.setColor(firstColor);
-            g.drawString(player1.getName(), getWidth() / 20, getHeight() / 20);
-            g.drawString(Integer.toString(player1.getPoints()), getWidth() / 20, getHeight() / 20 + 20);
-            g.drawString(Integer.toString(player1.getHit()),  getWidth() / 20, getHeight() /20 + 40);
-            g.drawString(Integer.toString(player1.getAllShots()), getWidth() / 20, getHeight() /20 + 60);
+            g.drawString(player1.getName(), (int)(defaultWidth*a), (int)(defaultHeight*a));
+            g.drawString(Integer.toString(player1.getPoints()), (int)(defaultWidth*a), (int)(defaultHeight*a+20));
+            g.drawString(Integer.toString(player1.getHit()), (int)(defaultWidth*a), (int)(defaultHeight*a+40));
+            g.drawString(Integer.toString(player1.getAllShots()),(int)(defaultWidth*a), (int)(defaultHeight*a+60));
             g.setFont(font1);
             g.setColor(secondColor);
-            g.drawString(player2.getName(), 5 * getWidth() / 8, getHeight() / 20);
-            g.drawString(Integer.toString(player2.getPoints()), 5 * getWidth() / 8, getHeight() / 20 + 20);
-            g.drawString(Integer.toString(player2.getHit()), 5 * getWidth() / 8, getHeight() /20 + 40);
-            g.drawString(Integer.toString(player2.getAllShots()), 5 * getWidth() / 8, getHeight() /20 + 60);
+            g.drawString(player2.getName(),(int)(defaultWidth*b), (int)(defaultHeight*a));
+            g.drawString(Integer.toString(player2.getPoints()), (int)(defaultWidth*b), (int)(defaultHeight*a+20));
+            g.drawString(Integer.toString(player2.getHit()), (int)(defaultWidth*b), (int)(defaultHeight*a+40));
+            g.drawString(Integer.toString(player2.getAllShots()), (int)(defaultWidth*b), (int)(defaultHeight*a+60));
         }
 
         if(levelHasAlreadyChanged) {
