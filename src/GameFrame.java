@@ -73,6 +73,7 @@ public class GameFrame extends Frame
         gamePanel.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
+
     }
 
     /**
@@ -217,6 +218,8 @@ public class GameFrame extends Frame
             setPanel.setFocusable(false);
             gamePanel.setFocusable(true);
 
+            gamePanel.addSettingsButtons(left,right,shoot,backButton,nextTurn);
+
 
 
             backButton.addActionListener(new ActionListener() {
@@ -236,8 +239,16 @@ public class GameFrame extends Frame
                     gamePanel.nextTurn();
                     gamePanel.requestFocus();
                     gamePanel.endOfLevel++;
+                   if(gamePanel.endOfLevel==5){
+                        backButton.setEnabled(false);
+                        nextTurn.setEnabled(false);
+                        shoot.setEnabled(false);
+                        weapons.setEnabled(false);
+                        right.setEnabled(false);
+                        left.setEnabled(false);
+                    }
                     numberOfMoves.setText(gamePanel.checkNumberOfMoves(gamePanel.checkTurnNumber()) + " moves left");
-                    gamePanel.repaint();
+                    //gamePanel.repaint();
                 }
             });
 

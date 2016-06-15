@@ -1,16 +1,17 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
+import javax.swing.Timer;
 
 /**
  * Klasa ta odpowiada za panel rozgrywki, umieszczony on jest w klasie <code>GameFrame</code>.
@@ -18,13 +19,15 @@ import java.util.concurrent.TimeUnit;
  */
 public class GamePanel extends JPanel implements KeyListener {
     private Font font1 = new Font("Calibri", Font.BOLD, 20), font2 = new Font("Calibri", Font.BOLD, 12);
+    Font big = new Font("Calibri", Font.BOLD,25);
     private Tank[] tank;
     private Tank currentTank;
     Thread[] tankThreads;
     private int level = 1;
     private Player player1 = new Player(NewGame.getColor1(), NewGame.getName1());
     private Player player2 = new Player(NewGame.getColor2(), NewGame.getName2());
-
+    private Timer t;
+    private JProgressBar jp;
     private int width, height;
     private int numberOfTanks = NewGame.getNumOfTanks();
     private int turnNumber = 1;
@@ -32,8 +35,9 @@ public class GamePanel extends JPanel implements KeyListener {
     public Color firstColor = NewGame.getRealColor1(), secondColor = NewGame.getRealColor2();
 
     private int direction;
-    public int endOfLevel = 1;
-    private boolean collisionDetected = false, levelHasAlreadyChanged = false;
+    public int endOfLevel = 1, timerV = 0;
+    private boolean collisionDetected = false, levelHasAlreadyChanged = false, drawStopText = false;
+    JButton left, right,shoot, backButton, nextTurn;
 
 
     private Image bImage;
@@ -54,6 +58,7 @@ public class GamePanel extends JPanel implements KeyListener {
         createTanks(tank);
         setDoubleBuffered(true);
         setFocusable(true);
+
         try {
             URL url = new URL("https://i.kinja-img.com/gawker-media/image/upload/s--wau7KSN4--/c_fit,fl_progressive,q_80,w_636/18bl3j27axli8jpg.jpg");
             bImage = ImageIO.read(url);
@@ -72,6 +77,12 @@ public class GamePanel extends JPanel implements KeyListener {
             return 1;
     }
 
+    public void weaponUpdate(){
+        for(int i=0; i<numberOfTanks;i++) {
+            tank[i].weaponCoordinatesUpdate();
+            repaint();
+        }
+    }
 
     public void changeNumberOfMoves(int firstOrSecond) {
         if (firstOrSecond == 0)
@@ -101,6 +112,12 @@ public class GamePanel extends JPanel implements KeyListener {
         return tank;
     }
 
+    public void doCountdown()
+    {
+        timerV = 0;
+        t.start();
+
+    }
     public void selectATank(Tank tank) {
 
         currentTank = tank;
@@ -122,13 +139,7 @@ public class GamePanel extends JPanel implements KeyListener {
         currentTank.setReadyToShot(true);
         currentTank.releaseTheBullet();
         repaint();
-    }
-
-    public void weaponUpdate(){
-        for(int i=0; i<numberOfTanks;i++) {
-            tank[i].weaponCoordinatesUpdate();
-            repaint();
-        }
+        shootDisable();
     }
 
     public Player getPlayer1(){return player1;}
@@ -154,6 +165,7 @@ public class GamePanel extends JPanel implements KeyListener {
 
         System.out.println("zmiana" + turnNumber);
         selectATank(tank[turnNumber - 1]);
+        shootEnable();
     }
 
     /**
@@ -164,35 +176,55 @@ public class GamePanel extends JPanel implements KeyListener {
      * @return Brak
      */
     @Override
-    public void paintComponent(Graphics g) {
-
+    public void paintComponent(Graphics g)
+    {
         super.paintComponent(g);
         double x, x2, y, y2;
-        int[] formax = new int[2];
-        Font big = new Font("Calibri", Font.BOLD,35);
-        int[] collisioCoordinates = new int[2];
-        //levelHasAlreadyChanged=false;
 
-        if (endOfLevel == 5) {
-           /* for (int i = 5; i >= 1; i--) {
-                try {
-                    g.clearRect(0, 0, getWidth(), getHeight());
-                    g.setFont(big);
-                    g.drawString("Zmiana poziomu za...", 100, 100);
-                    g.drawString(Integer.toString(i), getWidth() / 2, getHeight() / 10);
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (InterruptedException ex) {
-                    System.err.println("SIemka");
+
+        int[] formax = new int[2];
+
+        int[] collisioCoordinates = new int[2];
+        if (endOfLevel == 5)
+        {
+
+            levelHasAlreadyChanged = true;
+
+            t = new Timer(1000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (timerV == 4)
+                    {
+                        t.stop();
+                        jp.setVisible(false);
+                        timerV = 0;
+                    }
+                    else
+                    {
+                        g.drawString("Zmiana poziomu...",300,200);
+                        timerV++;
+                        jp.setValue(timerV);
+                    }
                 }
-            }*/
+            });
+            t.start();
+            jp = new JProgressBar(0,4);
+            jp.setValue(0);
+            jp.setStringPainted(true);
+            this.add(jp);
+            jp.setVisible(true);
+            jp.setBounds(getWidth()/3,getHeight()/3,300,100);
+
+
             player1.resetAll();
             player2.resetAll();
-            levelHasAlreadyChanged=true;
             endOfLevel = 1;
             level++;
-        }
-        loadMap(formax);
 
+            drawStopText = true;
+        }
+
+        loadMap(formax);
 
         int[] groundCoordinates = new int[this.getWidth() + 2];
         groundCoordinates = countGroundCoordinates(formax);
@@ -238,6 +270,13 @@ public class GamePanel extends JPanel implements KeyListener {
             collisionDetected = false;
         }
 
+        if(drawStopText){
+            String text="To start new Level, please press space";
+            g.setColor(Color.black);
+            g.setFont(font1);
+            g.drawString(text,getWidth()/5,getHeight()/10);
+        }
+
         if (turnNumber % 2 == 1) {
             g.setFont(font1);
             g.setColor(firstColor);
@@ -266,10 +305,33 @@ public class GamePanel extends JPanel implements KeyListener {
             g.drawString(Integer.toString(player2.getAllShots()), 5 * getWidth() / 8, getHeight() /20 + 60);
         }
 
-
         if(levelHasAlreadyChanged) {
             weaponUpdate();
             levelHasAlreadyChanged = false;
+        }
+
+        if (level > 5)
+        {
+            //g.setColor(Color.WHITE);
+            //g.clearRect(0,0,getWidth(),getHeight());
+            g.setColor(Color.BLACK);
+            g.setFont(big);
+            g.drawString("KONIEC GRY!", getWidth()/4,getHeight()/4);
+            if (player1.getPoints() > player2.getPoints())
+            {
+                g.drawString("Zwycięzca: " + player1.getName(),getWidth()/4,getHeight()/4 +100);
+                g.drawString("Ilość punktów: " + player1.getPoints(),getWidth()/4,getHeight()/4 +150);
+            }
+            else if (player2.getPoints() > player1.getPoints())
+            {
+                g.drawString("Zwycięzca: " + player2.getName(),getWidth()/4,getHeight()/4+100);
+                g.drawString("Ilość punktów: " + player2.getPoints(),getWidth()/4,getHeight()/43 +150);
+            }
+
+            else
+            {
+                g.drawString("Mamy remis proszę państwa!",getWidth()/4,getHeight()/4+100);
+            }
         }
 
         repaint();
@@ -278,9 +340,30 @@ public class GamePanel extends JPanel implements KeyListener {
     public int[] countGroundCoordinates(int[] coefficient) {
         int[] groundCoordinates = new int[this.getWidth() + 2];
 
+        if (level < 3){
+            for (int i = 1; i < this.getWidth() + 2; i++) {
+                groundCoordinates[i] = (int) (200 + coefficient[0] * Math.sin((double) (i) / 50) + coefficient[1]);
+            }
+        }
+        else if (level == 3)
+        {
+            for (int i = 1; i < this.getWidth() + 2; i++) {
+                groundCoordinates[i] = (int) (200 + coefficient[0] * (Math.sin(((double) i - (this.getWidth()/2))/5)/(((double)i-(this.getWidth()/2)/5) + coefficient[1])));
+            }
+        }
 
-        for (int i = 1; i < this.getWidth() + 2; i++) {
-            groundCoordinates[i] = (int) (200 + coefficient[0] * Math.sin((double) (i) / 50) + coefficient[1]);
+        else if (level == 4)
+        {
+            for (int i = 1; i < this.getWidth() + 2; i++) {
+                groundCoordinates[i] = (int) (200 + coefficient[0] * Math.sin((double) (i) / 50) + coefficient[1]);
+            }
+        }
+
+        else if (level >= 5)
+        {
+            for (int i = 1; i < this.getWidth() + 2; i++) {
+                groundCoordinates[i] = (int) (200 + coefficient[0] * Math.sin((double) (i) / 50) + coefficient[1]);
+            }
         }
         return groundCoordinates;
     }
@@ -366,61 +449,51 @@ public class GamePanel extends JPanel implements KeyListener {
 
 
     private int[] loadMap(int[] form) {
-        String a = "0", b = "0";
+        String a = "0", b = "0", nameOfFile = "";
         switch (level) {
-            case 1: {
-                try {
-                    File mapFile = new File("maplvl1.properties");
-                    Properties pro = new Properties();
-                    FileInputStream fis = new FileInputStream(mapFile);
-                    pro.load(fis);
-                    a = pro.getProperty("a");
-                    b = pro.getProperty("b");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                form[0] = Integer.parseInt(a);
-                form[1] = Integer.parseInt(b);
-
+            case 1:
+            {
+                nameOfFile = "maplvl1.properties";
                 break;
             }
 
-            case 2: {
-
-                try {
-                    File mapFile = new File("maplvl2.properties");
-                    Properties pro = new Properties();
-                    FileInputStream fis = new FileInputStream(mapFile);
-                    pro.load(fis);
-                    a = pro.getProperty("a");
-                    b = pro.getProperty("b");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                form[0] = Integer.parseInt(a);
-                form[1] = Integer.parseInt(b);
-
-
+            case 2:
+            {
+                nameOfFile = "maplvl2.properties";
                 break;
             }
+
             case 3:
             {
-                try {
-                    File mapFile = new File("maplvl3.properties");
-                    Properties pro = new Properties();
-                    FileInputStream fis = new FileInputStream(mapFile);
-                    pro.load(fis);
-                    a = pro.getProperty("a");
-                    b = pro.getProperty("b");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                form[0] = Integer.parseInt(a);
-                form[1] = Integer.parseInt(b);
+                nameOfFile = "maplvl3.properties";
+                break;
+            }
 
+            case 4:
+            {
+                nameOfFile = "maplvl4.properties";
+                break;
+            }
+
+            default:
+            {
+                nameOfFile = "maplvl5.properties";
                 break;
             }
         }
+        try {
+            File mapFile = new File(nameOfFile);
+            Properties pro = new Properties();
+            FileInputStream fis = new FileInputStream(mapFile);
+            pro.load(fis);
+            a = pro.getProperty("a");
+            b = pro.getProperty("b");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        form[0] = Integer.parseInt(a);
+        form[1] = Integer.parseInt(b);
+
         return form;
     }
 
@@ -445,8 +518,12 @@ public class GamePanel extends JPanel implements KeyListener {
             currentTank.setXDirection(1);
         }
         if (keyCode == e.VK_SPACE) {
-            //currentTank.startTime=System.currentTimeMillis();
-            currentTank.releaseTheBullet();
+            right.setEnabled(true);
+            left.setEnabled(true);
+            backButton.setEnabled(true);
+            nextTurn.setEnabled(true);
+            shoot.setEnabled(true);
+            drawStopText=false;
         }
     }
 
@@ -464,5 +541,19 @@ public class GamePanel extends JPanel implements KeyListener {
         if (keyCode == e.VK_RIGHT) {
             currentTank.setXDirection(0);
         }
+    }
+
+    public void addSettingsButtons(JButton l, JButton r, JButton sh, JButton bb, JButton nt){
+        left=l;
+        right=r;
+        shoot=sh;
+        backButton=bb;
+        nextTurn=nt;
+    }
+    public void shootDisable(){
+        shoot.setEnabled(false);
+    }
+    public void shootEnable(){
+        shoot.setEnabled(true);
     }
 }
