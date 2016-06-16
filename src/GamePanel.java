@@ -1,5 +1,6 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,9 +39,10 @@ public class GamePanel extends JPanel implements KeyListener {
     public int endOfLevel = 1, timerV = 0;
     private boolean collisionDetected = false, levelHasAlreadyChanged = false, drawStopText = false, setDefoultSize=false;
     JButton left, right,shoot, backButton, nextTurn;
+    Choice weapons;
 
-
-    private Image bImage;
+    private Image bImage,explosionGif, weaponImageStar, weaponImageStar2;
+    JLabel explosion;
 
     /**
      * Konstruktor klasy <code>GamePanel</code> przyjmuje wartości szerokości i wysokości panelu rozgrywki.
@@ -52,6 +54,24 @@ public class GamePanel extends JPanel implements KeyListener {
     public GamePanel(int x, int y) {
         width = x;
         height = y;
+        weaponImageStar2= null;
+
+        try {
+            URL url = new URL("http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons-256/rounded-glossy-black-icons-signs/095457-rounded-glossy-black-icon-signs-warning-biohazard.png");
+            weaponImageStar2 = ImageIO.read(url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        try {
+            URL url = new URL("http://rs651.pbsrc.com/albums/uu236/416o/explosion.gif~c200");
+            explosionGif=new ImageIcon(url).getImage();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
 
         setPreferredSize(new Dimension(width, height));
         tank = new Tank[numberOfTanks];
@@ -61,13 +81,14 @@ public class GamePanel extends JPanel implements KeyListener {
         setFocusable(true);
 
         try {
-            URL url = new URL("https://i.kinja-img.com/gawker-media/image/upload/s--wau7KSN4--/c_fit,fl_progressive,q_80,w_636/18bl3j27axli8jpg.jpg");
-            bImage = ImageIO.read(url);
+            URL url2 = new URL("http://www.cs.lafayette.edu/~gexia/cs104/labs/lab3/bigexplosion.gif");
+            bImage = ImageIO.read(url2);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
 
         setDefoultSize=true;
     }
@@ -103,11 +124,14 @@ public class GamePanel extends JPanel implements KeyListener {
     public Tank[] createTanks(Tank[] tank) {
         for (int i = 0; i < numberOfTanks; i++) {
             tankThreads[i] = new Thread(tank[i]);
+
             tank[i] = new Tank(width, 200, tankThreads[i]);
             if (i % 2 == 0)                                             //parzyste numery czołgów należa do gracza nr 1, nieparzyste do gracza 2
                 tank[i].colorOfTank = firstColor;
             else
                 tank[i].colorOfTank = secondColor;
+
+            tank[i].setWeaponImageStar(weaponImageStar2);
         }
 
         selectATank(tank[0]);
@@ -278,7 +302,7 @@ public class GamePanel extends JPanel implements KeyListener {
         collisioCoordinates = detectCollision(ground);//wykrycie kolizji z ziemia i innymi czolgami
         if (collisionDetected) {
             Collisions collision = new Collisions(getWidth(), getHeight(), g, collisioCoordinates[0], collisioCoordinates[1], bImage);
-            System.out.println("trafienie");
+            //System.out.println("trafienie");
             collisionDetected = false;
         }
 
@@ -345,6 +369,8 @@ public class GamePanel extends JPanel implements KeyListener {
             {
                 g.drawString("Mamy remis proszę państwa!",getWidth()/4,getHeight()/4+100);
             }
+
+
         }
 
         repaint();
@@ -393,7 +419,7 @@ public class GamePanel extends JPanel implements KeyListener {
 
         for (int i = 0; i < numberOfTanks; i++) {
             if (tank[numberOfShootingTank].getBulletFigure().intersects(tank[i].getTankFigure())) {
-                System.out.println("czolg trafiony");
+              //  System.out.println("czolg trafiony");
                 numberOfAttacedTank = i;
                 //collisionDetected = true;
                 if (numberOfShootingTank % 2 == 0) {
@@ -409,7 +435,7 @@ public class GamePanel extends JPanel implements KeyListener {
             }
 
             if (ground.intersects(tank[numberOfShootingTank].getBulletFigure())) {
-                System.out.println("ziemia trafiona");
+               // System.out.println("ziemia trafiona");
                 tank[numberOfShootingTank].setCollisionsDetected(true);
 
             }
@@ -536,6 +562,7 @@ public class GamePanel extends JPanel implements KeyListener {
             backButton.setEnabled(true);
             nextTurn.setEnabled(true);
             shoot.setEnabled(true);
+            weapons.setEnabled(true);
             drawStopText=false;
         }
     }
@@ -556,17 +583,28 @@ public class GamePanel extends JPanel implements KeyListener {
         }
     }
 
-    public void addSettingsButtons(JButton l, JButton r, JButton sh, JButton bb, JButton nt){
+    public void addSettingsButtons(JButton l, JButton r, JButton sh, JButton bb, JButton nt, Choice w){
         left=l;
         right=r;
         shoot=sh;
         backButton=bb;
         nextTurn=nt;
+        weapons=w;
     }
     public void shootDisable(){
         shoot.setEnabled(false);
     }
     public void shootEnable(){
         shoot.setEnabled(true);
+    }
+    public Tank getCurrentTank(){return currentTank;}
+    private void disableButtons(){
+        right.setEnabled(false);
+        left.setEnabled(false);
+        backButton.setEnabled(true);
+        nextTurn.setEnabled(false);
+        shoot.setEnabled(false);
+        weapons.setEnabled(false);
+
     }
 }

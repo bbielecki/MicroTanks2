@@ -1,8 +1,12 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.io.Console;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Klasa implementująca pojedynczy czołg.
@@ -20,9 +24,8 @@ public class Tank extends JPanel implements Runnable {
     private int sizeOfBullet;
     private int strengthOfShot, angleOfShot;
     private double speedY=600, speedX=8;
-    public long startTime, endTime, timeInterval;
     private double time;
-    private int x,y,xDirection,xBullet,yBullet,deltaX,xBulletDirection,yBulletDirection, widthOfPanel, heightOfPanel;
+    private int x,y,xDirection,xBullet,yBullet,deltaX, widthOfPanel, heightOfPanel;
     private int currentTankStartPosition;
     private static final int g=50;
     private int[] yCoordinates;
@@ -31,7 +34,8 @@ public class Tank extends JPanel implements Runnable {
     public Color colorOfTank;
     private int level=1;
     private Weapon weapon;
-    private int choosenWeapon = 2;
+    private int choosenWeapon = 1;
+    private Image weaponImageStar=null;
 
     /**
      * Konstruktor klasy <code>Tank</code> tworzy czołg w zależności od współrzędnych,
@@ -58,7 +62,6 @@ public class Tank extends JPanel implements Runnable {
         setDoubleBuffered(true);
         bulletFigure = new Rectangle(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon,sizeOfBullet,sizeOfBullet);
         tankFigure = new Rectangle(x-widthOfTank/2, y-heightOfTank, widthOfTank, heightOfTank);
-        weapon = new Weapon();
     }
 
     public void setyCoordinates(int yy,int i){
@@ -78,6 +81,7 @@ public class Tank extends JPanel implements Runnable {
 
         switch (choosenWeapon) {
             case 1: {
+                bulletFigure.setSize(sizeOfBullet,sizeOfBullet);
                 bulletFigure.setLocation(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon);
                 g.setColor(Color.black);
                 g.fillRect((int) bulletFigure.getX(), (int) bulletFigure.getY(), (int) bulletFigure.getWidth(), (int) bulletFigure.getHeight());
@@ -100,8 +104,10 @@ public class Tank extends JPanel implements Runnable {
                 break;
             }
             case 4:{
-
-
+                g.setColor(Color.LIGHT_GRAY);
+                bulletFigure.setLocation(xBullet-widthOfCannon/2,yBullet-heightOfTank-lenghtOfCannon);
+                bulletFigure.setSize(sizeOfBullet*4,sizeOfBullet*4);
+                drawWeapon(g,weaponImageStar,xBullet-widthOfCannon/2-widthOfPanel/20,yBullet-heightOfTank-lenghtOfCannon-heightOfPanel/20,widthOfPanel/10,heightOfPanel/8);
 
                 break;
             }
@@ -122,6 +128,13 @@ public class Tank extends JPanel implements Runnable {
 
      //   if(bulletFigure.intersects(tankFigure))
        //     System.out.println("bum");
+
+    }
+
+    public void drawWeapon(Graphics g,Image weapon, int x, int y, int width, int height ){
+
+        weapon = weapon.getScaledInstance(width,height,100);
+        g.drawImage(weapon, x,y, null);
 
     }
 
@@ -185,7 +198,7 @@ public class Tank extends JPanel implements Runnable {
                 time = 0;
             }
 
-            System.out.println("szczal   " + xBullet);
+           // System.out.println("szczal   " + xBullet);
             if(xBullet>=widthOfPanel*3 || xBullet<=-10 || yBullet<-100 || yBullet>=1000){
                 bulletReleased = false;
                 readyToShot = false;
@@ -204,7 +217,7 @@ public class Tank extends JPanel implements Runnable {
 
         time+=Math.abs(cnst);
         moveThread.sleep((long)Math.abs(cnst));
-        System.out.println(time);
+       // System.out.println(time);
         speed=-speedY+time*(double)g/2;
         if((speedX<0.001) && (speedX>-0.001))
             xBullet+=0;
@@ -236,7 +249,8 @@ public class Tank extends JPanel implements Runnable {
     public void setCurrentTankStartPosition(int pos){currentTankStartPosition=pos;}
     public void setReadyToShot(boolean ready) {readyToShot=ready;}
     public void setCollisionsDetected(boolean CD) {collisionsDetected=CD;}
-    public void setChoosenWepon(int chWeap){choosenWeapon=chWeap;}
+    public void setChosenWepon(int chWeap){choosenWeapon=chWeap;}
+    public void setWeaponImageStar(Image WIS){weaponImageStar=WIS;}
     public boolean isShooting(){return bulletReleased;}
     public Rectangle getBulletFigure(){return bulletFigure;}
     public Rectangle getTankFigure(){return tankFigure;}
