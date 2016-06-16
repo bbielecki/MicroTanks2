@@ -48,7 +48,7 @@ public class Client {
             }
         }
         try {
-            socket = new Socket("localhost", 54321);
+            socket = new Socket("192.168.1.5", 54321);
             outputStream = socket.getOutputStream();
             printWriter = new PrintWriter(outputStream, true);
 

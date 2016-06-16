@@ -4,7 +4,6 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Line2D;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -240,6 +239,7 @@ public class GameFrame extends Frame
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     gameFrame.setVisible(false);
+                    BestScores.saveScores(gamePanel.getPlayer1(),gamePanel.getPlayer2(),gamePanel.numberOfTanks/2);
                     gameFrame.remove(gamePanel);
                     gameFrame.remove(setPanel);
                     mainMenuFrame.setVisible(true);
@@ -297,6 +297,7 @@ public class GameFrame extends Frame
                 public void actionPerformed(ActionEvent e) {
                     gamePanel.setAngle(Integer.parseInt(angleMeasure.getText())+1);
                     angleMeasure.setText(""+(Integer.parseInt(angleMeasure.getText())+1)+"");
+                    gamePanel.requestFocus();
                 }
             });
             leftAngle.addActionListener(new ActionListener() {
@@ -304,6 +305,7 @@ public class GameFrame extends Frame
                 public void actionPerformed(ActionEvent e) {
                     gamePanel.setAngle(Integer.parseInt(angleMeasure.getText())-1);
                     angleMeasure.setText(""+(Integer.parseInt(angleMeasure.getText())-1)+"");
+                    gamePanel.requestFocus();
                 }
             });
 
@@ -312,6 +314,7 @@ public class GameFrame extends Frame
                 public void actionPerformed(ActionEvent e) {
                     gamePanel.setStrength(Integer.parseInt(powerMeasure.getText())+1);
                     powerMeasure.setText(""+(Integer.parseInt(powerMeasure.getText())+1));
+                    gamePanel.requestFocus();
                 }
             });
             leftPower.addActionListener(new ActionListener() {
@@ -319,6 +322,7 @@ public class GameFrame extends Frame
                 public void actionPerformed(ActionEvent e) {
                     gamePanel.setStrength(Integer.parseInt(powerMeasure.getText())-1);
                     powerMeasure.setText(""+(Integer.parseInt(powerMeasure.getText())-1));
+                    gamePanel.requestFocus();
                 }
             });
 
@@ -333,6 +337,7 @@ public class GameFrame extends Frame
                             gamePanel.changeNumberOfMoves(gamePanel.checkTurnNumber());
 
                             numberOfMoves.setText(gamePanel.checkNumberOfMoves(gamePanel.checkTurnNumber()) + " moves left");
+                            gamePanel.requestFocus();
                         }
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
@@ -350,6 +355,7 @@ public class GameFrame extends Frame
                             gamePanel.changeNumberOfMoves(gamePanel.checkTurnNumber());
 
                             numberOfMoves.setText(gamePanel.checkNumberOfMoves(gamePanel.checkTurnNumber()) + " moves left");
+                            gamePanel.requestFocus();
                         }
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
