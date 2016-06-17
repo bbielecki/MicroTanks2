@@ -282,6 +282,7 @@ public class BestScores extends Frame {
         Integer[] numbers = new Integer[11];
         for (int i = 0;i<10;i++)
         {
+            numbers[i] = new Integer(0);
             numbers[i] = Integer.parseInt(containersPoints[amount-1][i]);
         }
         numbers[10]=points;

@@ -146,6 +146,8 @@ public class MainMenu extends Frame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.setVisible(false);
+                Client client = new Client();
+                client.getBestScores();
                 bestScores.createABestScoresFrame(bestScoresFrame, frame);
                 bestScoresFrame.setVisible(true);
             }

@@ -242,6 +242,8 @@ public class GameFrame extends Frame
                     BestScores.saveScores(gamePanel.getPlayer1(),gamePanel.getPlayer2(),gamePanel.numberOfTanks/2);
                     gameFrame.remove(gamePanel);
                     gameFrame.remove(setPanel);
+                    Client client=new Client();
+                    client.setBestScores();
                     mainMenuFrame.setVisible(true);
 
                 }

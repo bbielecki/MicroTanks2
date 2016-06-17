@@ -24,7 +24,7 @@ public class GamePanel extends JPanel implements KeyListener {
     private Tank[] tank;
     private Tank currentTank;
     Thread[] tankThreads;
-    private int level = 5;
+    private int level = 1;
     private Player player1 = new Player(NewGame.getColor1(), NewGame.getName1());
     private Player player2 = new Player(NewGame.getColor2(), NewGame.getName2());
     private Timer t;
@@ -36,8 +36,8 @@ public class GamePanel extends JPanel implements KeyListener {
     public Color firstColor = NewGame.getRealColor1(), secondColor = NewGame.getRealColor2();
 
     private int direction;
-    public int endOfLevel = 1, timerV = 0;
-    private boolean collisionDetected = false, levelHasAlreadyChanged = false, drawStopText = false, setDefoultSize=false, doItFuckingOnce=true;
+    public int endOfLevel = 21, timerV = 0;
+    private boolean collisionDetected = false, levelHasAlreadyChanged = false, drawStopText = false, setDefoultSize=false;
     JButton left, right,shoot, backButton, nextTurn;
     Choice weapons;
 
